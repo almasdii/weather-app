@@ -13,8 +13,10 @@ import java.util.UUID;
 public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    private Long id;
+    @Column(name = "login",nullable = false,unique = true)
     private String login;
+    @Column(name = "password",nullable = false,unique = true)
     private String password;
     public User(String login,String password){
         this.login = login;

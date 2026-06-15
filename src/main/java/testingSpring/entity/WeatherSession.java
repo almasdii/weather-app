@@ -14,11 +14,11 @@ import java.util.UUID;
 public class WeatherSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
-    private UUID userId;
+    private Long id;
+    private Long userId;
     private LocalTime localTime;
 
-    public WeatherSession(UUID userId){
+    public WeatherSession(Long userId){
         this.userId = userId;
         localTime = LocalTime.now();
     }

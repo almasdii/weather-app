@@ -15,9 +15,9 @@ import java.util.UUID;
 public class Location{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    private Long id;
     private String name;
-    private UUID userId;
+    private Long userId;
     private BigDecimal latitube;
     private BigDecimal longitube;
 
@@ -25,7 +25,7 @@ public class Location{
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Location(String name, UUID userId, BigDecimal latitube, BigDecimal longitube) {
+    public Location(String name, Long userId, BigDecimal latitube, BigDecimal longitube) {
         this.name = name;
         this.userId = userId;
         this.latitube = latitube;

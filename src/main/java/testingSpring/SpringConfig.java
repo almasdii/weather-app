@@ -30,6 +30,7 @@ public class SpringConfig implements WebMvcConfigurer {
 //        return configuration.buildSessionFactory();
 //    }
 
+
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
