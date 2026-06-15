@@ -2,6 +2,7 @@ package testingSpring.entity;
 
 import lombok.*;
 
+import java.lang.annotation.Repeatable;
 import java.math.BigDecimal;
 import java.util.UUID;
 
