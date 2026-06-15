@@ -23,12 +23,12 @@ public class SpringConfig implements WebMvcConfigurer {
         this.applicationContext = applicationContext;
     }
 
-    @Bean
-    @Scope("singleton")
-    public SessionFactory sessionFactory(){
-        org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration();
-        return configuration.buildSessionFactory();
-    }
+//    @Bean
+//    @Scope("singleton")
+//    public SessionFactory sessionFactory(){
+//        org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration();
+//        return configuration.buildSessionFactory();
+//    }
 
     @Bean
     public SpringResourceTemplateResolver templateResolver() {

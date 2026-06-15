@@ -9,7 +9,9 @@
 
 <p>Hello world!</p>
 <form action="/auth/login" method="post">
-    <input type="text" name="username"/>
+    <p th:text="${userRegisterDto.name()}" />
+    <input  type="text" name="username"/>
+    <p th:text="${userRegisterDto.password}" />
     <input type="password" name="password"/>
     <button type="submit">Login</button>
 </form>

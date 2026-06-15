@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import testingSpring.dto.UserRegisterDto;
 import testingSpring.serivce.UserService;
 
 @Controller
@@ -42,6 +43,15 @@ public class AuthController {
 
     @PostMapping(value = "/register")
     public String register(Model model,HttpServletRequest request){
-
+        String login = request.getParameter("login");
+        String password = request.getParameter("password");
+        String repeatPassword = request.getParameter("repassword");
+        if(login == null || password == null || repeatPassword == null){
+            System.out.println("Enter login and password");
+        }
+        UserRegisterDto userRegisterDto = new UserRegisterDto(login,password);
+        model.addAttribute("userRegisterDto",userRegisterDto);
+        service.registerUser(userRegisterDto);
+        return "login";
     }
 }

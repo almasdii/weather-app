@@ -7,9 +7,12 @@
 
     <property name="connection.url">jdbc:postgresql://localhost:5432/postgres</property>
     <property name="connection.driver_class">org.postgresql.Driver</property>
-     <property name="connection.username">${db.username}</property>
-     <property name="connection.password">${db.password}</property>
+     <property name="connection.username">postgres</property>
+     <property name="connection.password">everlast</property>
+      <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
     <!-- DB schema will be updated if needed -->
-     <property name="hibernate.hbm2ddl.auto">validate</property> 
+     <property name="hibernate.hbm2ddl.auto">validate</property>
+      <property name="hibernate.current_session_context_class">thread</property>
+      <property name="hibernate.show_sql">true</property>
   </session-factory>
 </hibernate-configuration>

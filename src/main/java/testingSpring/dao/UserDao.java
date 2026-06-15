@@ -1,16 +1,30 @@
 package testingSpring.dao;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import testingSpring.DataSource;
 import testingSpring.entity.User;
 
 import java.util.UUID;
 
+@Repository
 public class UserDao implements Dao<UUID, User>{
-    private SessionFactory sessionFactory;
+    private final DataSource dataSource;
+
+    @Autowired
+    public UserDao(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    //    public static final String FIND_USER_BY_NAME = """
+//            SELECT
+//            """;
     @Override
     public User save(User user) {
-        sessionFactory.getCurrentSession();
-        return null;
+        Session currentSession = dataSource.getCurrentSession();
+        currentSession.persist(user);
+        return user;
     }
 
     @Override
@@ -27,4 +41,10 @@ public class UserDao implements Dao<UUID, User>{
     public boolean delete(UUID uuid) {
         return false;
     }
+
+//    public User findByLogin(String name){
+//        Session currentSession = sessionFactory.getCurrentSession();
+//        List<User> list = currentSession.createQuery(FIND_USER_BY_NAME, User.class).list();
+//
+//    }
 }
