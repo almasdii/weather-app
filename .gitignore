@@ -12,6 +12,7 @@ target/
 *.iws
 *.iml
 *.ipr
+.idea
 
 ### Eclipse ###
 .apt_generated
@@ -63,3 +64,6 @@ build/
 hs_err_pid*
 replay_pid*
 >>>>>>> 4e96d57b46b1781b6e3a8fa2bb7dba92bebef143
+
+.env
+application.properties

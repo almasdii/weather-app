@@ -1,25 +1,30 @@
 package testingSpring.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"id"})
+@EqualsAndHashCode(of = {"id"})
 @Table(name = "weather_session")
 @Entity
 public class WeatherSession {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
+    @Column(name = "user_id",nullable = false,updatable = false)
     private Long userId;
-    private LocalTime localTime;
+    @Column(name = "expires_at",nullable = false,updatable = false)
+    private LocalDateTime expiresAt;
 
-    public WeatherSession(Long userId){
+    public WeatherSession(UUID id,Long userId){
+        this.id = id;
         this.userId = userId;
-        localTime = LocalTime.now();
+        expiresAt = LocalDateTime.now();
     }
 }

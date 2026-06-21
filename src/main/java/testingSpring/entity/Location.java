@@ -1,33 +1,34 @@
 package testingSpring.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.lang.annotation.Repeatable;
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"id"})
 @Table(name = "weather_location")
 @Entity
 public class Location{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "name",nullable = false,unique = true)
     private String name;
-    private Long userId;
+    @Column(updatable = false,nullable = false)
     private BigDecimal latitube;
+    @Column(updatable = false,nullable = false)
     private BigDecimal longitube;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    public Location(String name, Long userId, BigDecimal latitube, BigDecimal longitube) {
+    public Location(String name, User user, BigDecimal latitube, BigDecimal longitube) {
         this.name = name;
-        this.userId = userId;
+        this.user = user;
         this.latitube = latitube;
         this.longitube = longitube;
     }
