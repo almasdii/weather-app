@@ -39,7 +39,7 @@ public class AuthController {
         if (result.hasErrors()){
             return "sign-in-with-errors";
         }
-        service.createSession(userLoginDto);
+        service.signIn(userLoginDto);
         System.out.println( userLoginDto);
 
         return "index";
