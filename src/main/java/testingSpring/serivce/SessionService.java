@@ -28,5 +28,9 @@ public class SessionService {
         WeatherSession session = new WeatherSession(uuid,userId);
         return sessionDao.save(session);
     }
+
+    public void findById(String value) {
+
+    }
 }
 

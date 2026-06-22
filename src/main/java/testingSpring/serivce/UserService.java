@@ -14,6 +14,8 @@ import testingSpring.exception.BadUserCredentialsException;
 import testingSpring.mapper.SessionDtoMapper;
 import testingSpring.mapper.SessionDtoMapperImpl;
 
+import java.util.UUID;
+
 @Slf4j
 @Service
 public class UserService {
@@ -39,6 +41,7 @@ public class UserService {
         User user = new User(dto.login(),dto.password());
         dao.save(user);
     }
+
     public SessionDto signIn(UserLoginDto dto){
         User user = dao.findByLogin(dto.login())
                 .orElseThrow(() -> new BadUserCredentialsException("Login or Password is incorrect"));
@@ -47,5 +50,17 @@ public class UserService {
         WeatherSession session = sessionService.createSession(user.getId());
         log.debug("New Session created with UUID :  {} userID : {} , created at : {}" ,session.getId(),session.getUserId(),session.getCreatedAt());
         return mapper.toSessionDto(session);
+    }
+
+    public void findBySessionId(String value) {
+        UUID uuid = UUID.fromString(value);
+        sessionService.findById(value);
+
+    }
+
+    public boolean isUserLoggedIn(String value) {
+        UUID uuid = UUID.fromString(value);
+
+
     }
 }
