@@ -20,11 +20,11 @@ public class WeatherSession {
     @Column(name = "user_id",nullable = false,updatable = false)
     private Long userId;
     @Column(name = "expires_at",nullable = false,updatable = false)
-    private LocalDateTime expiresAt;
+    private LocalDateTime createdAt;
 
     public WeatherSession(UUID id,Long userId){
         this.id = id;
         this.userId = userId;
-        expiresAt = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
     }
 }

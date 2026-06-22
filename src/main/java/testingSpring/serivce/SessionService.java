@@ -10,6 +10,7 @@ import java.util.UUID;
 @Service
 public class SessionService {
     private final SessionDao sessionDao;
+    private static final Long SESSION_LIFE_MINUTES = 20L;
 
     @Autowired
     public SessionService(SessionDao sessionDao) {
@@ -22,7 +23,10 @@ public class SessionService {
     }
 
 
-    public WeatherSession createSession(Long id) {
-        return new WeatherSession(UUID.randomUUID(),3L);
+    public WeatherSession createSession(Long userId) {
+        UUID uuid = UUID.randomUUID();
+        WeatherSession session = new WeatherSession(uuid,userId);
+        return sessionDao.save(session);
     }
 }
+

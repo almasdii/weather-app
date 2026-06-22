@@ -1,10 +1,12 @@
 package testingSpring.dao;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import testingSpring.entity.WeatherSession;
+import testingSpring.exception.DataBaseException;
 import testingSpring.serivce.SessionService;
 
 import java.util.UUID;
@@ -18,17 +20,24 @@ public class SessionDao implements Dao<UUID, WeatherSession> {
                     """;
     private static final String USER_ID_PLACEHOLDER = "user_id";
     private final SessionFactory factory;
-    private final SessionService sessionService;
 
     @Autowired
-    public SessionDao(SessionFactory factory, SessionService sessionService) {
+    public SessionDao(SessionFactory factory) {
         this.factory = factory;
-        this.sessionService = sessionService;
     }
 
     @Override
-    public WeatherSession save(WeatherSession user) {
-        return null;
+    public WeatherSession save(WeatherSession session) {
+        try{
+            Session currentSession = factory.getCurrentSession();
+            currentSession.beginTransaction();
+            currentSession.persist(session);
+            currentSession.getTransaction().commit();
+            return session;
+        }catch (HibernateException exception){
+            throw new DataBaseException(exception);
+        }
+
     }
 
     @Override
@@ -37,7 +46,7 @@ public class SessionDao implements Dao<UUID, WeatherSession> {
     }
 
     @Override
-    public boolean update(WeatherSession user) {
+    public boolean update(WeatherSession session) {
         return false;
     }
 
@@ -49,7 +58,7 @@ public class SessionDao implements Dao<UUID, WeatherSession> {
     public void removeByUserId(Long id) {
         Session currentSession = factory.getCurrentSession();
         currentSession.beginTransaction();
-        currentSession.createQuery(REMOVE_BY_USER_ID_QUERY,WeatherSession.class)
+        currentSession.createMutationQuery(REMOVE_BY_USER_ID_QUERY)
                 .setParameter(USER_ID_PLACEHOLDER,id)
                 .executeUpdate();
         currentSession.getTransaction().commit();

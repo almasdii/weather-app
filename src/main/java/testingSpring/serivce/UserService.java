@@ -1,8 +1,7 @@
 package testingSpring.serivce;
 
 import jakarta.transaction.Transactional;
-import org.hibernate.Session;
-import org.mapstruct.Mapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import testingSpring.dao.UserDao;
@@ -13,19 +12,19 @@ import testingSpring.entity.User;
 import testingSpring.entity.WeatherSession;
 import testingSpring.exception.BadUserCredentialsException;
 import testingSpring.mapper.SessionDtoMapper;
+import testingSpring.mapper.SessionDtoMapperImpl;
 
+@Slf4j
 @Service
 public class UserService {
     private final UserDao dao;
-    private final SessionService service;
     private final SessionService sessionService;
     private final SessionDtoMapper mapper;
 
 
     @Autowired
-    public UserService(UserDao dao, SessionService service, SessionService sessionService, SessionDtoMapper mapper) {
+    public UserService(UserDao dao, SessionService service, SessionService sessionService, SessionDtoMapperImpl mapper) {
         this.dao = dao;
-        this.service = service;
         this.sessionService = sessionService;
         this.mapper = mapper;
     }
@@ -46,6 +45,7 @@ public class UserService {
 
         sessionService.removeOldSessionsByUserId(user.getId());
         WeatherSession session = sessionService.createSession(user.getId());
+        log.debug("New Session created with UUID :  {} userID : {} , created at : {}" ,session.getId(),session.getUserId(),session.getCreatedAt());
         return mapper.toSessionDto(session);
     }
 }
