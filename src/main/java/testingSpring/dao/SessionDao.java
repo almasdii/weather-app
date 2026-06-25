@@ -3,16 +3,18 @@ package testingSpring.dao;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.annotations.OptimisticLocking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import testingSpring.entity.WeatherSession;
 import testingSpring.exception.DataBaseException;
 import testingSpring.serivce.SessionService;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public class SessionDao implements Dao<UUID, WeatherSession> {
+public class SessionDao {
     private static final String REMOVE_BY_USER_ID_QUERY =
             """
                     DELETE FROM WeatherSession ws
@@ -26,7 +28,6 @@ public class SessionDao implements Dao<UUID, WeatherSession> {
         this.factory = factory;
     }
 
-    @Override
     public WeatherSession save(WeatherSession session) {
         try{
             Session currentSession = factory.getCurrentSession();
@@ -40,17 +41,18 @@ public class SessionDao implements Dao<UUID, WeatherSession> {
 
     }
 
-    @Override
-    public WeatherSession find(UUID uuid) {
-        return null;
+    public Optional<WeatherSession> find(UUID uuid) {
+        Session currentSession = factory.getCurrentSession();
+        currentSession.beginTransaction();
+        WeatherSession session = currentSession.find(WeatherSession.class, uuid);
+        currentSession.getTransaction().commit();
+        return Optional.ofNullable(session);
     }
 
-    @Override
     public boolean update(WeatherSession session) {
         return false;
     }
 
-    @Override
     public boolean delete(UUID uuid) {
         return false;
     }

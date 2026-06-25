@@ -18,8 +18,6 @@ public class LocationService {
     }
     public List<LocationDto> findByUserId(Long id){
         List<Location> byUserId = dao.findByUserId(id);
-
-
         return List.of(new LocationDto[]{});
     }
 }

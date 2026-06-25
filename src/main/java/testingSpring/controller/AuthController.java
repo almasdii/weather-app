@@ -16,17 +16,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import testingSpring.dto.SessionDto;
 import testingSpring.dto.UserLoginDto;
 import testingSpring.dto.UserRegisterDto;
+import testingSpring.serivce.AuthService;
 import testingSpring.serivce.UserService;
+import testingSpring.util.SessionParams;
+
+import java.util.UUID;
 
 @Slf4j
 @Controller
 @RequestMapping(value = "/auth")
 public class AuthController {
 
-    private final UserService service;
+    private final AuthService service;
 
     @Autowired
-    public AuthController(UserService service) {
+    public AuthController(AuthService service) {
         this.service = service;
     }
 
@@ -45,19 +49,24 @@ public class AuthController {
             return "sign-in-with-errors";
         }
         SessionDto sessionDto = service.signIn(userLoginDto);
-        Cookie cookie = new Cookie("SessionUUID",sessionDto.id().toString());
+        Cookie cookie = createCookie(sessionDto.id().toString());
+        response.addCookie(cookie);
+        return "redirect:/";
+    }
+    private Cookie createCookie(String uuid){
+        Cookie cookie = new Cookie(SessionParams.SESSION_UUID,uuid);
         cookie.setMaxAge(1200);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/home");
-        response.addCookie(cookie);
-        return "redirect:/";
+        return cookie;
     }
 
     @GetMapping(value = "/sign-up")
     public String signUpPage(@ModelAttribute("userRegisterDto")  UserRegisterDto userRegisterDto) {
         return "sign-up";
     }
+
 
     @PostMapping(value = "/sign-up")
     public String signUp(@ModelAttribute("userRegisterDto") @Valid UserRegisterDto userRegisterDto , BindingResult result) {

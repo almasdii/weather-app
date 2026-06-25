@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import testingSpring.dao.SessionDao;
 import testingSpring.entity.WeatherSession;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,8 +30,8 @@ public class SessionService {
         return sessionDao.save(session);
     }
 
-    public void findById(String value) {
-
+    public Optional<WeatherSession> findById(UUID uuid) {
+        return sessionDao.find(uuid);
     }
 }
 

@@ -1,11 +1,14 @@
 package testingSpring;
 
+import jakarta.servlet.FilterRegistration;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
@@ -16,17 +19,23 @@ import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import testingSpring.entity.Location;
 import testingSpring.entity.User;
 import testingSpring.entity.WeatherSession;
+import testingSpring.filter.AuthFilter;
+import testingSpring.serivce.AuthService;
 
 import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan("testingSpring")
 @EnableWebMvc
+@PropertySource("classpath:database.properties")
 public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
+    private final Environment environment;
 
-    public SpringConfig(ApplicationContext applicationContext) {
+    @Autowired
+    public SpringConfig(ApplicationContext applicationContext, Environment environment) {
         this.applicationContext = applicationContext;
+        this.environment = environment;
     }
 
     @Override
@@ -43,13 +52,16 @@ public class SpringConfig implements WebMvcConfigurer {
 
     @Bean
     public DataSource dataSource(){
+        System.out.println(environment.getProperty("driver_value")+ " " +
+                environment.getProperty("url_value")+ " " +
+                environment.getProperty("username_value")+ " "+
+                environment.getProperty("password_value"));
         return new DriverDataSource(SpringConfig.class.getClassLoader(),
-                "org.postgresql.Driver",
-                "jdbc:postgresql://localhost:5432/postgres?currentSchema=weather",
-                "postgres",
-                "everlast");
+                environment.getProperty("driver_value"),
+                environment.getProperty("url_value"),
+                environment.getProperty("username_value"),
+                environment.getProperty("password_value"));
     }
-
 
     @Bean(initMethod = "migrate")
     public Flyway flyway(){

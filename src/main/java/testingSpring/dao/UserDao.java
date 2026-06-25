@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public class UserDao implements Dao<UUID, User>{
+public class UserDao{
     private final SessionFactory sessionFactory;
 
     public static final String FIND_BY_LOGIN = """
@@ -24,7 +24,7 @@ public class UserDao implements Dao<UUID, User>{
     public UserDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
-    @Override
+
     public User save(User user) {
 
         Session currentSession = sessionFactory.getCurrentSession();
@@ -34,17 +34,18 @@ public class UserDao implements Dao<UUID, User>{
         return user;
     }
 
-    @Override
-    public User find(UUID uuid) {
-        return null;
+    public Optional<User> find(Long id) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        currentSession.beginTransaction();
+        User user = currentSession.find(User.class, id);
+        currentSession.getTransaction().commit();
+        return Optional.ofNullable(user);
     }
 
-    @Override
     public boolean update(User user) {
         return false;
     }
 
-    @Override
     public boolean delete(UUID uuid) {
         return false;
     }
