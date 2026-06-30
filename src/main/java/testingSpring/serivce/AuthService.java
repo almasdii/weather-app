@@ -1,20 +1,18 @@
 package testingSpring.serivce;
 
-import jakarta.transaction.Transactional;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import testingSpring.dao.UserDao;
-import testingSpring.dto.SessionDto;
-import testingSpring.dto.UserLoginDto;
-import testingSpring.dto.UserRegisterDto;
+import testingSpring.dto.SessionResponseDto;
+import testingSpring.dto.UserLoginRequest;
+import testingSpring.dto.UserRegisterRequest;
 import testingSpring.entity.User;
 import testingSpring.entity.WeatherSession;
 import testingSpring.exception.BadUserCredentialsException;
 import testingSpring.exception.UserNotFoundException;
-import testingSpring.mapper.SessionDtoMapper;
-import testingSpring.mapper.SessionDtoMapperImpl;
+import testingSpring.mapper.SessionMapper;
+import testingSpring.mapper.SessionMapperImpl;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -25,18 +23,18 @@ import java.util.UUID;
 public class AuthService {
     private final UserDao dao;
     private final SessionService sessionService;
-    private final SessionDtoMapper mapper;
+    private final SessionMapper mapper;
     private final UserDao userDao;
 
     @Autowired
-    public AuthService(UserDao dao, SessionService sessionService, SessionDtoMapperImpl mapper, UserDao userDao) {
+    public AuthService(UserDao dao, SessionService sessionService, SessionMapperImpl mapper, UserDao userDao) {
         this.dao = dao;
         this.sessionService = sessionService;
         this.mapper = mapper;
         this.userDao = userDao;
     }
 
-    public SessionDto signIn(UserLoginDto dto){
+    public SessionResponseDto authenticate(UserLoginRequest dto){
         User user = dao.findByLogin(dto.login())
                 .orElseThrow(() -> new BadUserCredentialsException("Login or Password is incorrect"));
 
@@ -69,12 +67,10 @@ public class AuthService {
         return true;
     }
 
-    @Transactional
-    public void registerUser(UserRegisterDto dto){
+    public void register(UserRegisterRequest dto){
         //validation
         //mapping
         //dao.save
-        System.out.println("sdugvcah ptvgrhdfivobuyrge");
         User user = new User(dto.login(),dto.password());
         dao.save(user);
     }

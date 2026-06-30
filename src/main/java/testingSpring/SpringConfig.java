@@ -1,6 +1,5 @@
 package testingSpring;
 
-import jakarta.servlet.FilterRegistration;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
@@ -19,8 +18,6 @@ import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import testingSpring.entity.Location;
 import testingSpring.entity.User;
 import testingSpring.entity.WeatherSession;
-import testingSpring.filter.AuthFilter;
-import testingSpring.serivce.AuthService;
 
 import javax.sql.DataSource;
 
@@ -52,10 +49,6 @@ public class SpringConfig implements WebMvcConfigurer {
 
     @Bean
     public DataSource dataSource(){
-        System.out.println(environment.getProperty("driver_value")+ " " +
-                environment.getProperty("url_value")+ " " +
-                environment.getProperty("username_value")+ " "+
-                environment.getProperty("password_value"));
         return new DriverDataSource(SpringConfig.class.getClassLoader(),
                 environment.getProperty("driver_value"),
                 environment.getProperty("url_value"),

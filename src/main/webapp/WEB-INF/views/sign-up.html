@@ -19,19 +19,19 @@
 
     <div class="row justify-content-center">
         <div class="col-12 col-lg-4 col-md-6 col-sm-12">
-            <form th:action="@{/auth/sign-up}" th:method="POST" th:object="${userRegisterDto}" class="mt-4">
+            <form th:action="@{/auth/sign-up}" th:method="POST" th:object="${userRegisterRequest}" class="mt-4">
 
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" th:field="${userRegisterDto.login}" id="username" name="username" required value=""/>
+                    <input type="text" class="form-control" th:field="${userRegisterRequest.login}" id="username" name="username" required value=""/>
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" th:field="${userRegisterDto.password}" id="password" name="password" required value=""/>
+                    <input type="password" class="form-control" th:field="${userRegisterRequest.password}" id="password" name="password" required value=""/>
                 </div>
                 <div class="mb-3">
                     <label for="repeat-password" class="form-label">Repeat password</label>
-                    <input type="password" class="form-control" th:field="${userRegisterDto.rePassword}" id="repeat-password" name="password" required value=""/>
+                    <input type="password" class="form-control" th:field="${userRegisterRequest.rePassword}" id="repeat-password" name="password" required value=""/>
                 </div>
 
                 <input type="hidden" name="redirect_to" value="http://localhost/"/>
