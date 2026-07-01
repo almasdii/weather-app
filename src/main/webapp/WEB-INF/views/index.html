@@ -16,7 +16,9 @@
         </a>
         <div class="d-flex align-items-center">
             <span class="navbar-text me-3">zhukovsd</span>
-            <button th:href="@{/auth/sign-out}" th:method="POST"  class="btn btn-outline-danger">Sign out</button>
+            <form th:action="@{/auth/sign-out}" th:method="POST">
+                <input type="submit" value="Sign Out" class="btn btn-primary">
+            </form>
         </div>
     </div>
 </nav>

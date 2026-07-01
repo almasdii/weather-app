@@ -1,11 +1,11 @@
 package testingSpring.mapper;
 
 import org.mapstruct.Mapper;
-import testingSpring.dto.SessionResponseDto;
+import testingSpring.dto.SessionLoginResponse;
 import testingSpring.entity.WeatherSession;
 @Mapper(componentModel = "spring")
 public interface SessionMapper {
-    SessionResponseDto toSessionDto(WeatherSession session);
-    WeatherSession toWeatherSession(SessionResponseDto sessionResponseDto);
+    SessionLoginResponse sessionToSessionLoginResponse(WeatherSession session);
+    WeatherSession sessionLoginResponseToSession(SessionLoginResponse sessionLoginResponse);
 }
 

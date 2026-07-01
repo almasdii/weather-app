@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import testingSpring.entity.Location;
+import testingSpring.entity.WeatherSession;
 import testingSpring.exception.DataBaseException;
 
 import java.util.List;
@@ -61,7 +62,16 @@ public class LocationDao implements Dao<UUID, Location> {
 
     @Override
     public boolean delete(UUID uuid) {
-        return false;
+        try {
+            Session currentSession = factory.getCurrentSession();
+            currentSession.beginTransaction();
+            WeatherSession session = currentSession.find(WeatherSession.class, uuid);
+            currentSession.remove(session);
+            currentSession.getTransaction().commit();
+            return true;
+        }catch (HibernateException exception){
+            throw new DataBaseException(exception);
+        }
     }
 
 

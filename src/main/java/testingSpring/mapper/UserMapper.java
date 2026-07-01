@@ -8,10 +8,10 @@ import testingSpring.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    UserLoginRequest toUserLoginDto(User user);
-    User toUser(UserLoginRequest userLoginRequest);
+    UserLoginRequest userToUserLoginRequest(User user);
+    User userLoginRequestToUser(UserLoginRequest userLoginRequest);
 
     @Mapping(target = "rePassword",source = "user.password")
-    UserRegisterRequest toUserRegisterDto(User user);
-    User toUser(UserRegisterRequest userRegisterRequest);
+    UserRegisterRequest userToUserRegisterRequest(User user);
+    User userRegisterRequestToUser(UserRegisterRequest userRegisterRequest);
 }

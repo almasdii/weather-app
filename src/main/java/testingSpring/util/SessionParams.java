@@ -5,4 +5,5 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class SessionParams {
     public final String SESSION_UUID = "SessionUUID";
+    public final Long maxSessionTime = 20L;
 }

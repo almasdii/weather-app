@@ -35,6 +35,7 @@ public class SpringConfig implements WebMvcConfigurer {
         this.environment = environment;
     }
 
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/images/**")

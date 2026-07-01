@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import testingSpring.serivce.AuthService;
+import testingSpring.serivce.SessionService;
 import testingSpring.util.SessionParams;
 
 import java.io.IOException;
@@ -21,10 +22,12 @@ import java.util.Optional;
 public class AuthFilter extends OncePerRequestFilter {
 
     private final AuthService service;
+    private final SessionService sessionService;
 
     @Autowired
-    public AuthFilter(AuthService service) {
+    public AuthFilter(AuthService service, SessionService sessionService) {
         this.service = service;
+        this.sessionService = sessionService;
     }
 
     @Override
@@ -32,30 +35,29 @@ public class AuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String servletPath = request.getServletPath();
-
         log.debug("servlet path before do filter = {}",servletPath);
 
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            response.sendRedirect("/home/auth/sign-in");
+            response.sendRedirect("/weather/auth/sign-in");
             return;
         }
 
-        Optional<String> maybeValue = Arrays.stream(cookies)
+        Optional<String> sessionUuidOptional = getSession(cookies);
+        if (sessionUuidOptional.isEmpty() || !service.isAuthenticated(sessionUuidOptional.get())) {
+            log.debug("Sending redirect ");
+            response.sendRedirect("/weather/auth/sign-in");
+            return;
+        }
+        filterChain.doFilter(request, response);
+        log.debug("servlet path after do filter = {}",servletPath);
+    }
+
+    private Optional<String> getSession(Cookie[] cookies){
+        return Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals(SessionParams.SESSION_UUID))
                 .map(Cookie::getValue)
                 .findFirst();
-
-        maybeValue.ifPresent(s -> log.debug("Session UUID : {} ", s));
-        if (maybeValue.isEmpty() || !service.isAuthenticated(maybeValue.get())) {
-            log.debug("Sending redirect ");
-            response.sendRedirect("/home/auth/sign-in");
-            return;
-        }
-
-
-        filterChain.doFilter(request, response);
-        log.debug("servlet path after do filter = {}",servletPath);
     }
 
 

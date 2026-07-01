@@ -2,7 +2,7 @@ package testingSpring.dto;
 
 import java.util.UUID;
 
-public record SessionResponseDto(
+public record SessionLoginResponse(
         UUID id,
         Long userId
 ) {
