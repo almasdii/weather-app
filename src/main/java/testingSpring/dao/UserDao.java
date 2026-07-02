@@ -1,10 +1,12 @@
 package testingSpring.dao;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import testingSpring.entity.User;
+import testingSpring.exception.DataBaseException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -13,12 +15,19 @@ import java.util.UUID;
 public class UserDao{
     private final SessionFactory sessionFactory;
 
-    public static final String FIND_BY_LOGIN = """
+    private static final String FIND_BY_LOGIN = """
             SELECT u 
             FROM User u 
             WHERE u.login = :login
             """;
+    private static final String FIND_BY_SESSION_ID = """
+            SELECT u
+            FROM User u
+            JOIN WeatherSession w ON u.id = w.userId
+            WHERE w.id = :sessionId
+            """;
     private static final String LOGIN = "login";
+    private static final String SESSION = "sessionId";
 
     @Autowired
     public UserDao(SessionFactory sessionFactory) {
@@ -59,5 +68,19 @@ public class UserDao{
                 .uniqueResultOptional();
         currentSession.getTransaction().commit();
         return user;
+    }
+
+    public Optional<User> findBySessionId(String userSession) {
+        try{
+            Session currentSession = sessionFactory.getCurrentSession();
+            currentSession.getTransaction().begin();
+            Optional<User> userOptional = currentSession.createQuery(FIND_BY_SESSION_ID, User.class)
+                    .setParameter(SESSION, userSession)
+                    .uniqueResultOptional();
+            currentSession.getTransaction().commit();
+            return userOptional;
+        }catch (HibernateException exception){
+            throw new DataBaseException(exception);
+        }
     }
 }

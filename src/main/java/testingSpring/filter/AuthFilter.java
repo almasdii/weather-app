@@ -49,6 +49,7 @@ public class AuthFilter extends OncePerRequestFilter {
             response.sendRedirect("/weather/auth/sign-in");
             return;
         }
+        request.setAttribute("userSession",sessionUuidOptional.get());
         filterChain.doFilter(request, response);
         log.debug("servlet path after do filter = {}",servletPath);
     }

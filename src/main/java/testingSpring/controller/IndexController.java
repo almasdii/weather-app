@@ -20,8 +20,4 @@ public class IndexController {
         this.locationService = locationService;
     }
 
-    @GetMapping
-    public String indexPage(Model model, HttpServletRequest request){
-        return "index";
-    }
 }

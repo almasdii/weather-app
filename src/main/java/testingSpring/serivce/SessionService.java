@@ -11,7 +11,6 @@ import java.util.UUID;
 @Service
 public class SessionService {
     private final SessionDao sessionDao;
-    private static final Long SESSION_LIFE_MINUTES = 20L;
 
     @Autowired
     public SessionService(SessionDao sessionDao) {

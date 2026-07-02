@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import testingSpring.entity.Location;
+import testingSpring.entity.User;
 import testingSpring.entity.WeatherSession;
 import testingSpring.exception.DataBaseException;
 

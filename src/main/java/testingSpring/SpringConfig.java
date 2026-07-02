@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.support.DelegatingErrorHandlingRunnable;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
@@ -18,8 +19,11 @@ import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import testingSpring.entity.Location;
 import testingSpring.entity.User;
 import testingSpring.entity.WeatherSession;
+import tools.jackson.databind.ObjectMapper;
 
 import javax.sql.DataSource;
+import java.net.http.HttpClient;
+import java.time.Duration;
 
 @Configuration
 @ComponentScan("testingSpring")
@@ -35,6 +39,17 @@ public class SpringConfig implements WebMvcConfigurer {
         this.environment = environment;
     }
 
+    @Bean
+    public HttpClient httpClient() {
+        return HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper(){
+        return new ObjectMapper();
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
