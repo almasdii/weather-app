@@ -12,7 +12,6 @@ import java.util.List;
 public interface LocationMapper {
     @Mapping(target = "lon",source = "longitube")
     @Mapping(target = "lat",source = "latitube")
-    @Mapping(target = "name",source = "name")
     LocationResponse locationToLocationResponse(Location location);
     List<LocationResponse> locationListToLocationResponseList(List<Location> locations);
 

@@ -7,6 +7,8 @@ import testingSpring.dao.UserDao;
 import testingSpring.entity.User;
 import testingSpring.exception.UserNotFoundException;
 
+import java.util.UUID;
+
 @Slf4j
 @Service
 public class UserService {
@@ -18,7 +20,7 @@ public class UserService {
     }
 
     public User findBySessionId(String userSession) {
-        User user = userDao.findBySessionId(userSession).orElseThrow(() -> new UserNotFoundException("User not found with this session"));
-        return user;
+        UUID uuid = UUID.fromString(userSession);
+        return userDao.findBySessionId(uuid).orElseThrow(() -> new UserNotFoundException("User not found with this session"));
     }
 }

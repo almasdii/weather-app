@@ -70,7 +70,7 @@ public class UserDao{
         return user;
     }
 
-    public Optional<User> findBySessionId(String userSession) {
+    public Optional<User> findBySessionId(UUID userSession) {
         try{
             Session currentSession = sessionFactory.getCurrentSession();
             currentSession.getTransaction().begin();
