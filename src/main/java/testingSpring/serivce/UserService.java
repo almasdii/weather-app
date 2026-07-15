@@ -19,8 +19,7 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public User findBySessionId(String userSession) {
-        UUID uuid = UUID.fromString(userSession);
+    public User findBySessionId(UUID uuid) {
         return userDao.findBySessionId(uuid).orElseThrow(() -> new UserNotFoundException("User not found with this session"));
     }
 }

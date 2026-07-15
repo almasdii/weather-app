@@ -52,7 +52,7 @@ public class OpenWeatherClient {
     public LocationDetailsView mapJson(String string){
         JsonNode jsonNode = mapper.readTree(string);
         JsonNode main = jsonNode.get("main");
-        JsonNode weather = jsonNode.get("weather");
+        JsonNode weather = jsonNode.get("weather").get(0);
         JsonNode coord = jsonNode.get("coord");
 
         Integer humidity = main.get("humidity").asInt();

@@ -22,7 +22,11 @@ public class LocationDao implements Dao<UUID, Location> {
             WHERE u.id = :user_id
             """;
     private static final String USER_ID = "user_id";
-
+    private static final String DELETE_BY_NAME = """
+            DELETE FROM Location l 
+            WHERE l.name = :name
+            """;
+    private static final String NAME = "name";
     private final SessionFactory factory;
 
     @Autowired
@@ -46,7 +50,15 @@ public class LocationDao implements Dao<UUID, Location> {
 
     @Override
     public Location save(Location user) {
-        return null;
+        try {
+            Session currentSession = factory.getCurrentSession();
+            currentSession.beginTransaction();
+            currentSession.persist(user);
+            currentSession.getTransaction().commit();
+            return user;
+        }catch (HibernateException exception){
+            throw new DataBaseException(exception);
+        }
     }
 
     @Override
@@ -76,4 +88,16 @@ public class LocationDao implements Dao<UUID, Location> {
     }
 
 
+    public void remove(String name) {
+        try {
+            Session currentSession = factory.getCurrentSession();
+            currentSession.beginTransaction();
+            currentSession.createMutationQuery(DELETE_BY_NAME)
+                    .setParameter(NAME,name)
+                    .executeUpdate();
+            currentSession.getTransaction().commit();
+        }catch (HibernateException exception){
+            throw new DataBaseException(exception);
+        }
+    }
 }

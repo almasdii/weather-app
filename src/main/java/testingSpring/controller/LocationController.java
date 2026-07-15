@@ -5,14 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import testingSpring.dto.LocationAddRequest;
 import testingSpring.dto.LocationDetailsView;
 import testingSpring.dto.LocationSearchView;
 import testingSpring.serivce.LocationService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Controller
@@ -39,5 +40,21 @@ public class LocationController {
         model.addAttribute("locations",search);
         model.addAttribute("name",name);
         return "search-results";
+    }
+
+
+    @PostMapping("/add")
+    public String addLocation(@ModelAttribute LocationAddRequest locationAddRequest, @CookieValue("SessionUUID") UUID sessionUUID) {
+        log.debug("lon : {} , lat : {} ",locationAddRequest.lon(),locationAddRequest.lat());
+//        return ResponseEntity.ok("");
+        locationService.addLocation(locationAddRequest,sessionUUID);
+        return "redirect:/";
+    }
+
+    @PostMapping("/location/delete")
+    public String deleteLocation(@ModelAttribute("name") String name){
+        log.debug("delete location name : {} ", name);
+        locationService.delete(name);
+        return "redirect:/";
     }
 }

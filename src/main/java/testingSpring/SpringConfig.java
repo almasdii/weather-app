@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.orm.jpa.hibernate.HibernateTransactionManager;
+import org.springframework.orm.jpa.hibernate.LocalSessionFactoryBean;
 import org.springframework.scheduling.support.DelegatingErrorHandlingRunnable;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -24,6 +26,7 @@ import tools.jackson.databind.ObjectMapper;
 import javax.sql.DataSource;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.Properties;
 
 @Configuration
 @ComponentScan("testingSpring")
@@ -82,16 +85,32 @@ public class SpringConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    @Scope("singleton")
     @DependsOn(value = "flyway")
-    public SessionFactory sessionFactory(){
-        org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration();
-        configuration.addAnnotatedClass(User.class);
-        configuration.addAnnotatedClass(Location.class);
-        configuration.addAnnotatedClass(WeatherSession.class);
-        configuration.configure();
-        return configuration.buildSessionFactory();
+    public LocalSessionFactoryBean sessionFactory(){
+        LocalSessionFactoryBean localSessionFactoryBean = new LocalSessionFactoryBean();
+        localSessionFactoryBean.setDataSource(dataSource());
+        localSessionFactoryBean.setHibernateProperties(hibernateProperties());
+        localSessionFactoryBean.setPackagesToScan("testingSpring");
+        return localSessionFactoryBean;
     }
+
+    private Properties hibernateProperties(){
+        Properties properties = new Properties();
+        properties.put("hibernate.format_sql",environment.getProperty("hibernate.format_sql"));
+        properties.put("hibernate.show_sql",environment.getProperty("hibernate.show_sql"));
+        properties.put("hibernate.current_session_context_class",environment.getProperty("hibernate.current_session_context_class"));
+        properties.put("hibernate.hbm2ddl.auto",environment.getProperty("hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.dialect",environment.getProperty("hibernate.dialect"));
+        properties.put("hibernate.default_schema",environment.getProperty("hibernate.default_schema"));
+        return properties;
+    }
+    @Bean
+    public HibernateTransactionManager transactionManager(){
+        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
+        transactionManager.setSessionFactory(sessionFactory().getObject());
+        return transactionManager;
+    }
+
 
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
@@ -110,7 +129,6 @@ public class SpringConfig implements WebMvcConfigurer {
         return templateEngine;
     }
 
-
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
@@ -118,3 +136,15 @@ public class SpringConfig implements WebMvcConfigurer {
         registry.viewResolver(viewResolver);
     }
 }
+
+//    @Bean
+//    @Scope("singleton")
+//    @DependsOn(value = "flyway")
+//    public SessionFactory sessionFactory(){
+//        org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration();
+//        configuration.addAnnotatedClass(User.class);
+//        configuration.addAnnotatedClass(Location.class);
+//        configuration.addAnnotatedClass(WeatherSession.class);
+//        configuration.configure();
+//        return configuration.buildSessionFactory();
+//    }

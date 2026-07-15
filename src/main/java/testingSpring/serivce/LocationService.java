@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import testingSpring.api.OpenWeatherClient;
 import testingSpring.dao.LocationDao;
+import testingSpring.dto.LocationAddRequest;
 import testingSpring.dto.LocationDetailsView;
 import testingSpring.dto.LocationResponse;
 import testingSpring.dto.LocationSearchView;
@@ -13,7 +14,9 @@ import testingSpring.entity.User;
 import testingSpring.mapper.LocationMapper;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -32,7 +35,7 @@ public class LocationService {
     }
 
     public List<LocationDetailsView> findAll(String userSession) throws IOException, InterruptedException {
-        User user = userService.findBySessionId(userSession);
+        User user = userService.findBySessionId(UUID.fromString(userSession));
         List<Location> byUserId = locationDao.findByUserId(user.getId());
         byUserId.forEach((location)-> log.debug("users locations : {}",location.getName()));
         List<LocationResponse> locationResponses
@@ -48,5 +51,18 @@ public class LocationService {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void addLocation(LocationAddRequest locationAddRequest, UUID sessionUUID) {
+        User user = userService.findBySessionId(sessionUUID);
+        Location location = new Location(locationAddRequest.name()
+                ,user
+                ,BigDecimal.valueOf(locationAddRequest.lat())
+                ,BigDecimal.valueOf(locationAddRequest.lon()));
+        locationDao.save(location);
+    }
+
+    public void delete(String name) {
+        locationDao.remove(name);
     }
 }
