@@ -3,6 +3,7 @@ package testingSpring.serivce;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import testingSpring.api.OpenWeatherClient;
 import testingSpring.dao.LocationDao;
 import testingSpring.dto.LocationAddRequest;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class LocationService {
     private final LocationDao locationDao;
     private final UserService userService;
@@ -34,8 +36,8 @@ public class LocationService {
         this.locationMapper = locationMapper;
     }
 
-    public List<LocationDetailsView> findAll(String userSession) throws IOException, InterruptedException {
-        User user = userService.findBySessionId(UUID.fromString(userSession));
+    public List<LocationDetailsView> findAll(UUID sessionValue) {
+        User user = userService.findBySessionId(sessionValue);
         List<Location> byUserId = locationDao.findByUserId(user.getId());
         byUserId.forEach((location)-> log.debug("users locations : {}",location.getName()));
         List<LocationResponse> locationResponses
@@ -46,9 +48,7 @@ public class LocationService {
     public List<LocationSearchView> search(String name) {
         try {
             return openWeatherClient.search(name);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

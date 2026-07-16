@@ -43,7 +43,7 @@ public class LocationDao implements Dao<UUID, Location> {
                     .list();
             currentSession.getTransaction().commit();
             return list;
-        }catch (HibernateException exception){
+        } catch (HibernateException exception) {
             throw new DataBaseException(exception);
         }
     }
@@ -56,7 +56,7 @@ public class LocationDao implements Dao<UUID, Location> {
             currentSession.persist(user);
             currentSession.getTransaction().commit();
             return user;
-        }catch (HibernateException exception){
+        } catch (HibernateException exception) {
             throw new DataBaseException(exception);
         }
     }
@@ -82,7 +82,7 @@ public class LocationDao implements Dao<UUID, Location> {
             currentSession.remove(session);
             currentSession.getTransaction().commit();
             return true;
-        }catch (HibernateException exception){
+        } catch (HibernateException exception) {
             throw new DataBaseException(exception);
         }
     }
@@ -93,10 +93,10 @@ public class LocationDao implements Dao<UUID, Location> {
             Session currentSession = factory.getCurrentSession();
             currentSession.beginTransaction();
             currentSession.createMutationQuery(DELETE_BY_NAME)
-                    .setParameter(NAME,name)
+                    .setParameter(NAME, name)
                     .executeUpdate();
             currentSession.getTransaction().commit();
-        }catch (HibernateException exception){
+        } catch (HibernateException exception) {
             throw new DataBaseException(exception);
         }
     }

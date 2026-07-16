@@ -12,7 +12,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = {"id"})
-@Table(name = "weather_session")
+@Table(name = "weather_session",schema = "weather_schema")
 @Entity
 public class WeatherSession {
     @Id

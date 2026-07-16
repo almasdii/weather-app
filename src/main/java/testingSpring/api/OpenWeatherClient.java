@@ -30,7 +30,7 @@ public class OpenWeatherClient {
         this.mapper = mapper;
     }
 
-    public List<LocationDetailsView> findAll(List<LocationResponse> locationResponses) throws IOException, InterruptedException {
+    public List<LocationDetailsView> findAll(List<LocationResponse> locationResponses) {
 
         List<LocationDetailsView> locationDetailsViewsList = new ArrayList<>();
         for(LocationResponse locationResponse: locationResponses){
@@ -41,7 +41,12 @@ public class OpenWeatherClient {
                     .uri(URI.create(url))
                     .GET()
                     .build();
-            HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> send = null;
+            try {
+                send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             LocationDetailsView locationDetailsView = mapJson(send.body());
             locationDetailsViewsList.add(locationDetailsView);
         }

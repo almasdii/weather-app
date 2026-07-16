@@ -2,37 +2,31 @@ package testingSpring.controller;
 
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import testingSpring.dto.SessionLoginResponse;
+import org.springframework.web.bind.annotation.*;
 import testingSpring.dto.UserLoginRequest;
 import testingSpring.dto.UserRegisterRequest;
 import testingSpring.serivce.AuthService;
-import testingSpring.util.SessionParams;
-import testingSpring.util.UserValidator;
+import testingSpring.util.SessionParameters;
+import testingSpring.validator.UserRegisterValidator;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Controller
 @RequestMapping(value = "/auth")
 public class AuthController {
+    private final UserRegisterValidator validator;
 
-    private final UserValidator validator;
     private final AuthService service;
 
     @Autowired
-    public AuthController(UserValidator validator, AuthService service) {
+    public AuthController(UserRegisterValidator validator, AuthService service) {
         this.validator = validator;
         this.service = service;
     }
@@ -51,18 +45,9 @@ public class AuthController {
         if (result.hasErrors()){
             return "sign-in-with-errors";
         }
-        SessionLoginResponse sessionLoginResponse = service.authenticate(userLoginRequest);
-        setCookie(response, sessionLoginResponse.id().toString());
+        UUID sessionUuid = service.authenticate(userLoginRequest);
+        setCookie(response, sessionUuid.toString(), SessionParameters.MAX_SESSION_SECONDS);
         return "redirect:/";
-    }
-
-    private void setCookie(HttpServletResponse response, String sessionValue){
-        Cookie cookie = new Cookie(SessionParams.SESSION_UUID, sessionValue);
-        cookie.setMaxAge(1200);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/weather");
-        response.addCookie(cookie);
     }
 
     @GetMapping(value = "/sign-up")
@@ -72,7 +57,7 @@ public class AuthController {
 
     @PostMapping(value = "/sign-up")
     public String signUp(@ModelAttribute("userRegisterRequest") @Valid UserRegisterRequest userRegisterRequest, BindingResult result) {
-        log.debug("User register request : {} ",userRegisterRequest);
+        log.debug("User register request : {} ",userRegisterRequest.toString());
         validator.validate(userRegisterRequest,result);
 
         if(result.hasErrors()){
@@ -84,28 +69,20 @@ public class AuthController {
     }
 
     @PostMapping(value = "/sign-out")
-    public String signOut(HttpServletRequest request,HttpServletResponse response){
-        Cookie[] cookies = request.getCookies();
-        Optional<String> sessionValue = getSessionValue(cookies);
-        if (sessionValue.isEmpty()){
+    public String signOut(@CookieValue("sessionUUID") UUID sessionUuid, HttpServletResponse response){
+        if (sessionUuid == null){
             return "redirect:/auth/sign-in";
         }
-        expiresSession(response,sessionValue.get());
-        service.logout(sessionValue.get());
+        setCookie(response,sessionUuid.toString(),SessionParameters.EXPIRES_SESSION);
+        service.logout(sessionUuid.toString());
         return "redirect:/auth/sign-in";
     }
-    private void expiresSession(HttpServletResponse response,String session){
-        Cookie cookie = new Cookie(SessionParams.SESSION_UUID, session);
-        cookie.setMaxAge(0);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/weather");
+    private void setCookie(HttpServletResponse response, String sessionUuid,int maxAge){
+        Cookie cookie = new Cookie(SessionParameters.SESSION_UUID, sessionUuid);
+        cookie.setMaxAge(maxAge);
+        cookie.setHttpOnly(SessionParameters.SET_HTTP_ONLY);
+        cookie.setSecure(SessionParameters.SET_SECURE);
+        cookie.setPath(SessionParameters.PATH);
         response.addCookie(cookie);
-    }
-    private Optional<String> getSessionValue(Cookie[] cookies){
-        return Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals(SessionParams.SESSION_UUID))
-                .map(Cookie::getValue)
-                .findFirst();
     }
 }

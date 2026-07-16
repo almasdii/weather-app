@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import testingSpring.dto.LocationAddRequest;
@@ -26,10 +27,9 @@ public class LocationController {
     }
 
     @GetMapping
-    public String indexPage(Model model, HttpServletRequest request) throws IOException, InterruptedException {
-        String userSession = (String) request.getAttribute("userSession");
-        log.debug("User session value : {}",userSession);
-        List<LocationDetailsView> all = locationService.findAll(userSession);
+    public String indexPage(Model model, @CookieValue("sessionUUID") UUID sessionUuid) throws IOException, InterruptedException {
+        log.debug("User session value : {}",sessionUuid);
+        List<LocationDetailsView> all = locationService.findAll(sessionUuid);
         model.addAttribute("locations",all);
         return "index";
     }
@@ -46,7 +46,6 @@ public class LocationController {
     @PostMapping("/add")
     public String addLocation(@ModelAttribute LocationAddRequest locationAddRequest, @CookieValue("SessionUUID") UUID sessionUUID) {
         log.debug("lon : {} , lat : {} ",locationAddRequest.lon(),locationAddRequest.lat());
-//        return ResponseEntity.ok("");
         locationService.addLocation(locationAddRequest,sessionUUID);
         return "redirect:/";
     }

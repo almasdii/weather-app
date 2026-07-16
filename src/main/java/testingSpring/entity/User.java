@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(exclude = {"id"})
 @Entity
-@Table(name = "weather_user")
+@Table(name = "weather_user",schema = "weather_schema")
 public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

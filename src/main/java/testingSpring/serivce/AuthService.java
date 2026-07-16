@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import testingSpring.dao.UserDao;
-import testingSpring.dto.SessionLoginResponse;
 import testingSpring.dto.UserLoginRequest;
 import testingSpring.dto.UserRegisterRequest;
 import testingSpring.entity.User;
@@ -13,7 +13,7 @@ import testingSpring.entity.WeatherSession;
 import testingSpring.exception.BadUserCredentialsException;
 import testingSpring.mapper.SessionMapper;
 import testingSpring.mapper.SessionMapperImpl;
-import testingSpring.util.SessionParams;
+import testingSpring.util.SessionParameters;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -21,6 +21,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class AuthService {
     private final UserDao userDao;
     private final SessionService sessionService;
@@ -34,18 +35,20 @@ public class AuthService {
         this.mapper = mapper;
     }
 
-    public SessionLoginResponse authenticate(UserLoginRequest dto){
+    public UUID authenticate(UserLoginRequest dto){
         User user = userDao.findByLogin(dto.login())
                 .orElseThrow(() -> new BadUserCredentialsException("Login or Password is incorrect"));
-        log.debug("user hash password in db : {} and {} ",user.getPassword(),dto.password());
-        if(!encoder.matches(dto.password(), user.getPassword())){
-            throw new BadUserCredentialsException("Login or password is incorrect");
-        }
 
-        sessionService.removeOldSessionsByUserId(user.getId());
-        WeatherSession session = sessionService.createSession(user.getId());
+
+
+        sessionService.removeByUserId(user.getId());
+        WeatherSession session = sessionService.create(user.getId());
         log.debug("New Session created with UUID :  {} userID : {} , created at : {}" ,session.getId(),session.getUserId(),session.getCreatedAt());
-        return mapper.sessionToSessionLoginResponse(session);
+        return session.getId();
+    }
+
+    public boolean isPasswordMatch(String currentPassword,String targetPassword){
+        return encoder.matches(currentPassword, targetPassword);
     }
 
     public boolean isAuthenticated(String sessionUuid) {
@@ -67,7 +70,7 @@ public class AuthService {
     }
 
     private boolean isExpired(LocalDateTime createdAt){
-        return LocalDateTime.now().isAfter(createdAt.plusMinutes(SessionParams.maxSessionTime));
+        return LocalDateTime.now().isAfter(createdAt.plusMinutes(SessionParameters.MAX_SESSION_MINUTES));
     }
 
     public void register(UserRegisterRequest dto){

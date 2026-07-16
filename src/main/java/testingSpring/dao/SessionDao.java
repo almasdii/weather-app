@@ -49,20 +49,11 @@ public class SessionDao {
         return Optional.ofNullable(session);
     }
 
-    public boolean update(WeatherSession session) {
-        return false;
-    }
 
-    public boolean delete(UUID uuid) {
-        return false;
-    }
-
-    public void removeByUserId(Long id) {
+    public int removeByUserId(Long id) {
         Session currentSession = factory.getCurrentSession();
-        currentSession.beginTransaction();
-        currentSession.createMutationQuery(REMOVE_BY_USER_ID_QUERY)
-                .setParameter(USER_ID_PLACEHOLDER,id)
+        return currentSession.createMutationQuery(REMOVE_BY_USER_ID_QUERY)
+                .setParameter(USER_ID_PLACEHOLDER, id)
                 .executeUpdate();
-        currentSession.getTransaction().commit();
     }
 }

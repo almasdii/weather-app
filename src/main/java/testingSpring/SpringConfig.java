@@ -3,14 +3,18 @@ package testingSpring;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.hibernate.HibernateTransactionManager;
 import org.springframework.orm.jpa.hibernate.LocalSessionFactoryBean;
-import org.springframework.scheduling.support.DelegatingErrorHandlingRunnable;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
@@ -18,9 +22,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
-import testingSpring.entity.Location;
-import testingSpring.entity.User;
-import testingSpring.entity.WeatherSession;
 import tools.jackson.databind.ObjectMapper;
 
 import javax.sql.DataSource;
@@ -31,6 +32,8 @@ import java.util.Properties;
 @Configuration
 @ComponentScan("testingSpring")
 @EnableWebMvc
+@EnableTransactionManagement
+@EnableJpaRepositories("testingSpring.repository")
 @PropertySource("classpath:database.properties")
 public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
@@ -90,9 +93,22 @@ public class SpringConfig implements WebMvcConfigurer {
         LocalSessionFactoryBean localSessionFactoryBean = new LocalSessionFactoryBean();
         localSessionFactoryBean.setDataSource(dataSource());
         localSessionFactoryBean.setHibernateProperties(hibernateProperties());
-        localSessionFactoryBean.setPackagesToScan("testingSpring");
+        localSessionFactoryBean.setPackagesToScan("testingSpring.entity");
         return localSessionFactoryBean;
     }
+
+//    @Bean
+//    @DependsOn(value = "flyway")
+//    public LocalContainerEntityManagerFactoryBean entityManagerFactory(){
+//        LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+//        localContainerEntityManagerFactoryBean.setDataSource(dataSource());
+//        localContainerEntityManagerFactoryBean.setJpaProperties(hibernateProperties());
+//        localContainerEntityManagerFactoryBean.setPackagesToScan("testingSpring");
+//
+//        HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
+//        localContainerEntityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter);
+//        return localContainerEntityManagerFactoryBean;
+//    }
 
     private Properties hibernateProperties(){
         Properties properties = new Properties();
@@ -110,6 +126,14 @@ public class SpringConfig implements WebMvcConfigurer {
         transactionManager.setSessionFactory(sessionFactory().getObject());
         return transactionManager;
     }
+
+//    @Bean
+//    public PlatformTransactionManager transactionManager(){
+//        JpaTransactionManager transactionManager = new JpaTransactionManager();
+//
+//        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
+//        return transactionManager;
+//    }
 
 
     @Bean

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "weather_location")
+@Table(name = "weather_location",schema = "weather_schema")
 @Entity
 public class Location{
     @Id

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import testingSpring.serivce.AuthService;
 import testingSpring.serivce.SessionService;
-import testingSpring.util.SessionParams;
+import testingSpring.util.SessionParameters;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,28 +35,23 @@ public class AuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String servletPath = request.getServletPath();
-        log.debug("servlet path before do filter = {}",servletPath);
-
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             response.sendRedirect("/weather/auth/sign-in");
             return;
         }
-
         Optional<String> sessionUuidOptional = getSession(cookies);
         if (sessionUuidOptional.isEmpty() || !service.isAuthenticated(sessionUuidOptional.get())) {
-            log.debug("Sending redirect ");
             response.sendRedirect("/weather/auth/sign-in");
             return;
         }
         request.setAttribute("userSession",sessionUuidOptional.get());
         filterChain.doFilter(request, response);
-        log.debug("servlet path after do filter = {}",servletPath);
     }
 
     private Optional<String> getSession(Cookie[] cookies){
         return Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals(SessionParams.SESSION_UUID))
+                .filter(cookie -> cookie.getName().equals(SessionParameters.SESSION_UUID))
                 .map(Cookie::getValue)
                 .findFirst();
     }

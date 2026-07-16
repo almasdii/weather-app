@@ -1,5 +1,7 @@
 package testingSpring.dao;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -26,8 +28,16 @@ public class UserDao{
             JOIN WeatherSession w ON u.id = w.userId
             WHERE w.id = :sessionId
             """;
+
+    private static final String FIND_BY_LOGIN_AND_PASSWORD = """
+            SELECT u 
+            FROM User u 
+            WHERE u.login = :login
+            AND u.password = :password
+            """;
     private static final String LOGIN = "login";
     private static final String SESSION = "sessionId";
+    private static final String PASSWORD = "password";
 
     @Autowired
     public UserDao(SessionFactory sessionFactory) {
@@ -73,14 +83,24 @@ public class UserDao{
     public Optional<User> findBySessionId(UUID userSession) {
         try{
             Session currentSession = sessionFactory.getCurrentSession();
-            currentSession.getTransaction().begin();
-            Optional<User> userOptional = currentSession.createQuery(FIND_BY_SESSION_ID, User.class)
+            return currentSession.createQuery(FIND_BY_SESSION_ID, User.class)
                     .setParameter(SESSION, userSession)
                     .uniqueResultOptional();
-            currentSession.getTransaction().commit();
-            return userOptional;
         }catch (HibernateException exception){
             throw new DataBaseException(exception);
         }
     }
+
+    public Optional<User> findByLoginAndPassword(String login,String password) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        currentSession.getTransaction().begin();
+        Optional<User> user = currentSession
+                .createQuery(FIND_BY_LOGIN_AND_PASSWORD, User.class)
+                .setParameter(LOGIN, login)
+                .setParameter(PASSWORD,password)
+                .uniqueResultOptional();
+        currentSession.getTransaction().commit();
+        return user;
+    }
+
 }
