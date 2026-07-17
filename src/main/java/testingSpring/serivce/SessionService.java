@@ -8,7 +8,6 @@ import testingSpring.dao.SessionDao;
 import testingSpring.entity.WeatherSession;
 import testingSpring.exception.SessionNotFoundException;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -30,13 +29,21 @@ public class SessionService {
 
     @Transactional
     public WeatherSession create(Long userId) {
+        removeByUserId(userId);
+
         UUID uuid = UUID.randomUUID();
         WeatherSession session = new WeatherSession(uuid,userId);
+        log.debug("New Session created : {} ",session.getId());
         return sessionDao.save(session);
     }
 
-    public Optional<WeatherSession> findById(UUID uuid) {
-        Optional<WeatherSession> weatherSession = sessionDao.find(uuid).orElseThrow(() -> new SessionNotFoundException());
+    public WeatherSession findById(UUID uuid) {
+        return sessionDao.findById(uuid).orElseThrow(
+                        () -> new SessionNotFoundException("Session not found with this id : " + uuid));
+    }
+
+    public void remove(UUID sessionUuid) {
+        sessionDao.remove(sessionUuid);
     }
 }
 

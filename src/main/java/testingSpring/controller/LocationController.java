@@ -1,10 +1,8 @@
 package testingSpring.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import testingSpring.dto.LocationAddRequest;
@@ -12,12 +10,12 @@ import testingSpring.dto.LocationDetailsView;
 import testingSpring.dto.LocationSearchView;
 import testingSpring.serivce.LocationService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @Controller
+@RequestMapping("/locations")
 public class LocationController {
     private final LocationService locationService;
 
@@ -27,10 +25,10 @@ public class LocationController {
     }
 
     @GetMapping
-    public String indexPage(Model model, @CookieValue("sessionUUID") UUID sessionUuid) throws IOException, InterruptedException {
-        log.debug("User session value : {}",sessionUuid);
-        List<LocationDetailsView> all = locationService.findAll(sessionUuid);
-        model.addAttribute("locations",all);
+    public String indexPage(Model model, @CookieValue("SessionUUID") UUID sessionUuid){
+        log.debug("User session uuid : {}",sessionUuid);
+        List<LocationDetailsView> locationDetailsViews = locationService.findAll(sessionUuid);
+        model.addAttribute("locations",locationDetailsViews);
         return "index";
     }
 
@@ -50,7 +48,7 @@ public class LocationController {
         return "redirect:/";
     }
 
-    @PostMapping("/location/delete")
+    @PostMapping("/delete")
     public String deleteLocation(@ModelAttribute("name") String name){
         log.debug("delete location name : {} ", name);
         locationService.delete(name);

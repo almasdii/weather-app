@@ -9,7 +9,6 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(exclude = {"id"})
 @Entity
 @Table(name = "weather_user",schema = "weather_schema")
 public class User{
@@ -20,7 +19,7 @@ public class User{
     @Column(name = "login",nullable = false,unique = true)
     private String login;
 
-    @Column(name = "password",nullable = false,unique = true)
+    @Column(name = "password",nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "user")

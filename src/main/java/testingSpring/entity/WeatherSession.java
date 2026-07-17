@@ -17,7 +17,7 @@ import java.util.UUID;
 public class WeatherSession {
     @Id
     private UUID id;
-    @Column(name = "user_id",nullable = false,updatable = false)
+    @Column(name = "user_id",nullable = false,updatable = false,unique = true)
     private Long userId;
     @Column(name = "expires_at",nullable = false,updatable = false)
     private LocalDateTime createdAt;

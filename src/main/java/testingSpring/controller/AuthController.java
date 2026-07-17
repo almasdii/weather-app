@@ -13,6 +13,7 @@ import testingSpring.dto.UserLoginRequest;
 import testingSpring.dto.UserRegisterRequest;
 import testingSpring.serivce.AuthService;
 import testingSpring.util.SessionParameters;
+import testingSpring.validator.UserLoginValidator;
 import testingSpring.validator.UserRegisterValidator;
 
 import java.util.UUID;
@@ -21,15 +22,17 @@ import java.util.UUID;
 @Controller
 @RequestMapping(value = "/auth")
 public class AuthController {
-    private final UserRegisterValidator validator;
-
+    private final UserRegisterValidator userRegisterValidator;
+    private final UserLoginValidator userLoginValidator;
     private final AuthService service;
 
     @Autowired
-    public AuthController(UserRegisterValidator validator, AuthService service) {
-        this.validator = validator;
+    public AuthController(UserRegisterValidator userRegisterValidator, UserLoginValidator userLoginValidator, AuthService service) {
+        this.userRegisterValidator = userRegisterValidator;
+        this.userLoginValidator = userLoginValidator;
         this.service = service;
     }
+
 
     @GetMapping(value = "/sign-in")
     public String signInPage(@ModelAttribute("userLoginRequest") UserLoginRequest userLoginRequest) {
@@ -42,12 +45,13 @@ public class AuthController {
                          HttpServletResponse response) {
 
         log.info("user credentials {} , {} ", userLoginRequest.login(), userLoginRequest.password());
+        userLoginValidator.validate(userLoginRequest,result);
         if (result.hasErrors()){
             return "sign-in-with-errors";
         }
         UUID sessionUuid = service.authenticate(userLoginRequest);
         setCookie(response, sessionUuid.toString(), SessionParameters.MAX_SESSION_SECONDS);
-        return "redirect:/";
+        return "redirect:/locations";
     }
 
     @GetMapping(value = "/sign-up")
@@ -58,7 +62,7 @@ public class AuthController {
     @PostMapping(value = "/sign-up")
     public String signUp(@ModelAttribute("userRegisterRequest") @Valid UserRegisterRequest userRegisterRequest, BindingResult result) {
         log.debug("User register request : {} ",userRegisterRequest.toString());
-        validator.validate(userRegisterRequest,result);
+        userRegisterValidator.validate(userRegisterRequest,result);
 
         if(result.hasErrors()){
             return "sign-up-with-errors";
@@ -69,12 +73,12 @@ public class AuthController {
     }
 
     @PostMapping(value = "/sign-out")
-    public String signOut(@CookieValue("sessionUUID") UUID sessionUuid, HttpServletResponse response){
+    public String signOut(@CookieValue("SessionUUID") UUID sessionUuid, HttpServletResponse response){
         if (sessionUuid == null){
             return "redirect:/auth/sign-in";
         }
         setCookie(response,sessionUuid.toString(),SessionParameters.EXPIRES_SESSION);
-        service.logout(sessionUuid.toString());
+        service.logout(sessionUuid);
         return "redirect:/auth/sign-in";
     }
     private void setCookie(HttpServletResponse response, String sessionUuid,int maxAge){

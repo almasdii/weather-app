@@ -1,8 +1,9 @@
 package testingSpring.dao;
 
-public interface Dao<K,E> {
-    E save(E user);
-    E find(K uuid);
-    boolean update(E user);
-    boolean delete(K uuid);
+import java.util.Optional;
+
+public interface Dao<E,K> {
+    E save(E entity);
+    Optional<E> findById(K id);
+    void remove(K id);
 }

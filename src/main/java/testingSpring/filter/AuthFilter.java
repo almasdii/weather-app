@@ -16,18 +16,17 @@ import testingSpring.util.SessionParameters;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @Slf4j
 public class AuthFilter extends OncePerRequestFilter {
 
     private final AuthService service;
-    private final SessionService sessionService;
 
     @Autowired
-    public AuthFilter(AuthService service, SessionService sessionService) {
+    public AuthFilter(AuthService service) {
         this.service = service;
-        this.sessionService = sessionService;
     }
 
     @Override
@@ -41,7 +40,7 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
         Optional<String> sessionUuidOptional = getSession(cookies);
-        if (sessionUuidOptional.isEmpty() || !service.isAuthenticated(sessionUuidOptional.get())) {
+        if (sessionUuidOptional.isEmpty() || !service.isAuthenticated(UUID.fromString(sessionUuidOptional.get()))) {
             response.sendRedirect("/weather/auth/sign-in");
             return;
         }
@@ -61,7 +60,6 @@ public class AuthFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
 
         String path = request.getServletPath();
-        log.debug("starts with {}",path);
 
         return path.startsWith("/auth")
                 || path.startsWith("/css")

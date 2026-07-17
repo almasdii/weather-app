@@ -5,19 +5,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import testingSpring.dao.UserDao;
 import testingSpring.dto.UserLoginRequest;
 import testingSpring.entity.User;
+import testingSpring.serivce.AuthService;
+import testingSpring.serivce.UserService;
 
 import java.util.Optional;
 
 @Component
 public class UserLoginValidator implements Validator {
-    private final UserDao userDao;
+
+
+    private final UserService userService;
+    private final AuthService authService;
 
     @Autowired
-    public UserLoginValidator(UserDao userDao) {
-        this.userDao = userDao;
+    public UserLoginValidator(UserService userService, AuthService authService) {
+        this.userService = userService;
+        this.authService = authService;
     }
 
     @Override
@@ -30,14 +35,17 @@ public class UserLoginValidator implements Validator {
         UserLoginRequest loginRequest = (UserLoginRequest) target;
 
         Optional<User> userOptional
-                = userDao.findByLogin(loginRequest.login());
+                = userService.findByLogin(loginRequest.login());
 
         if (userOptional.isEmpty()){
             errors.rejectValue("name","","User is not exist with this login");
+            return;
         }
-        if(userOptional.isPresent()){
+        User user = userOptional.get();
+        if(!authService.isPasswordMatch(loginRequest.password(), userOptional.get().getPassword())){
+            errors.rejectValue("password","","Name or password is incorrect");
+        }
 
-        }
 
     }
 }

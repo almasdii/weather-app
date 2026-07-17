@@ -1,32 +1,31 @@
 package testingSpring.dao;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import testingSpring.entity.Location;
-import testingSpring.entity.User;
 import testingSpring.entity.WeatherSession;
-import testingSpring.exception.DataBaseException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@Component
-public class LocationDao implements Dao<UUID, Location> {
+@Repository
+public class LocationDao implements Dao<Location, UUID> {
     private static final String FIND_BY_USER_ID_QUERY = """
             SELECT l
             FROM Location l
             JOIN l.user u
             WHERE u.id = :user_id
             """;
-    private static final String USER_ID = "user_id";
-    private static final String DELETE_BY_NAME = """
-            DELETE FROM Location l 
+    private static final String DELETE_BY_NAME_QUERY = """
+            DELETE 
+            FROM Location l 
             WHERE l.name = :name
             """;
-    private static final String NAME = "name";
+    private static final String USER_ID_PLACEHOLDER = "user_id";
+    private static final String NAME_PLACEHOLDER = "name";
     private final SessionFactory factory;
 
     @Autowired
@@ -35,69 +34,38 @@ public class LocationDao implements Dao<UUID, Location> {
     }
 
     public List<Location> findByUserId(Long id) {
-        try {
-            Session currentSession = factory.getCurrentSession();
-            currentSession.beginTransaction();
-            List<Location> list = currentSession.createQuery(FIND_BY_USER_ID_QUERY, Location.class)
-                    .setParameter(USER_ID, id)
-                    .list();
-            currentSession.getTransaction().commit();
-            return list;
-        } catch (HibernateException exception) {
-            throw new DataBaseException(exception);
-        }
+        Session currentSession = factory.getCurrentSession();
+        return currentSession.createQuery(FIND_BY_USER_ID_QUERY, Location.class)
+                .setParameter(USER_ID_PLACEHOLDER, id)
+                .list();
     }
 
     @Override
-    public Location save(Location user) {
-        try {
-            Session currentSession = factory.getCurrentSession();
-            currentSession.beginTransaction();
-            currentSession.persist(user);
-            currentSession.getTransaction().commit();
-            return user;
-        } catch (HibernateException exception) {
-            throw new DataBaseException(exception);
-        }
+    public Optional<Location> findById(UUID id) {
+        Session currentSession = factory.getCurrentSession();
+        return Optional.ofNullable(currentSession.find(Location.class, id));
     }
 
     @Override
-    public Location find(UUID uuid) {
-        return null;
+    public Location save(Location entity) {
+        Session currentSession = factory.getCurrentSession();
+        currentSession.persist(entity);
+        return entity;
     }
 
 
     @Override
-    public boolean update(Location user) {
-        return false;
+    public void remove(UUID id) {
+        Session currentSession = factory.getCurrentSession();
+        WeatherSession session = currentSession.find(WeatherSession.class, id);
+        currentSession.remove(session);
     }
 
 
-    @Override
-    public boolean delete(UUID uuid) {
-        try {
-            Session currentSession = factory.getCurrentSession();
-            currentSession.beginTransaction();
-            WeatherSession session = currentSession.find(WeatherSession.class, uuid);
-            currentSession.remove(session);
-            currentSession.getTransaction().commit();
-            return true;
-        } catch (HibernateException exception) {
-            throw new DataBaseException(exception);
-        }
-    }
-
-
-    public void remove(String name) {
-        try {
-            Session currentSession = factory.getCurrentSession();
-            currentSession.beginTransaction();
-            currentSession.createMutationQuery(DELETE_BY_NAME)
-                    .setParameter(NAME, name)
-                    .executeUpdate();
-            currentSession.getTransaction().commit();
-        } catch (HibernateException exception) {
-            throw new DataBaseException(exception);
-        }
+    public void removeByName(String name) {
+        Session currentSession = factory.getCurrentSession();
+        currentSession.createMutationQuery(DELETE_BY_NAME_QUERY)
+                .setParameter(NAME_PLACEHOLDER, name)
+                .executeUpdate();
     }
 }

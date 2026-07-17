@@ -53,6 +53,7 @@ public class LocationService {
         }
     }
 
+    @Transactional
     public void addLocation(LocationAddRequest locationAddRequest, UUID sessionUUID) {
         User user = userService.findBySessionId(sessionUUID);
         Location location = new Location(locationAddRequest.name()
@@ -62,7 +63,8 @@ public class LocationService {
         locationDao.save(location);
     }
 
+    @Transactional
     public void delete(String name) {
-        locationDao.remove(name);
+        locationDao.removeByName(name);
     }
 }

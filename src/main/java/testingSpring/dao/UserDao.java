@@ -1,7 +1,5 @@
 package testingSpring.dao;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -14,92 +12,82 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public class UserDao{
+public class UserDao implements Dao<User, Long> {
     private final SessionFactory sessionFactory;
 
-    private static final String FIND_BY_LOGIN = """
+    private static final String FIND_BY_LOGIN_QUERY = """
             SELECT u 
             FROM User u 
             WHERE u.login = :login
             """;
-    private static final String FIND_BY_SESSION_ID = """
+    private static final String FIND_BY_SESSION_ID_QUERY = """
             SELECT u
             FROM User u
             JOIN WeatherSession w ON u.id = w.userId
             WHERE w.id = :sessionId
             """;
 
-    private static final String FIND_BY_LOGIN_AND_PASSWORD = """
+    private static final String FIND_BY_LOGIN_AND_PASSWORD_QUERY = """
             SELECT u 
             FROM User u 
             WHERE u.login = :login
             AND u.password = :password
             """;
-    private static final String LOGIN = "login";
-    private static final String SESSION = "sessionId";
-    private static final String PASSWORD = "password";
+    private static final String LOGIN_PLACEHOLDER = "login";
+    private static final String SESSION_PLACEHOLDER = "sessionId";
+    private static final String PASSWORD_PLACEHOLDER = "password";
 
     @Autowired
     public UserDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
-    public User save(User user) {
-
+    @Override
+    public User save(User entity) {
         Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.beginTransaction();
-        currentSession.persist(user);
-        currentSession.getTransaction().commit();
-        return user;
+        currentSession.persist(entity);
+        return entity;
     }
 
-    public Optional<User> find(Long id) {
+    @Override
+    public Optional<User> findById(Long id) {
         Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.beginTransaction();
         User user = currentSession.find(User.class, id);
-        currentSession.getTransaction().commit();
         return Optional.ofNullable(user);
     }
 
-    public boolean update(User user) {
-        return false;
-    }
-
-    public boolean delete(UUID uuid) {
-        return false;
-    }
-
-    public Optional<User> findByLogin(String loginName){
+    @Override
+    public void remove(Long id) {
         Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.getTransaction().begin();
-        Optional<User> user = currentSession
-                .createQuery(FIND_BY_LOGIN, User.class)
-                .setParameter(LOGIN, loginName)
-                .uniqueResultOptional();
-        currentSession.getTransaction().commit();
-        return user;
+        User user = currentSession.find(User.class, id);
+        currentSession.remove(user);
     }
 
+    public Optional<User> findByLogin(String loginName) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        return currentSession
+                .createQuery(FIND_BY_LOGIN_QUERY, User.class)
+                .setParameter(LOGIN_PLACEHOLDER, loginName)
+                .uniqueResultOptional();
+    }
     public Optional<User> findBySessionId(UUID userSession) {
-        try{
+        try {
             Session currentSession = sessionFactory.getCurrentSession();
-            return currentSession.createQuery(FIND_BY_SESSION_ID, User.class)
-                    .setParameter(SESSION, userSession)
+            return currentSession.createQuery(FIND_BY_SESSION_ID_QUERY, User.class)
+                    .setParameter(SESSION_PLACEHOLDER, userSession)
                     .uniqueResultOptional();
-        }catch (HibernateException exception){
+        } catch (HibernateException exception) {
             throw new DataBaseException(exception);
         }
     }
 
-    public Optional<User> findByLoginAndPassword(String login,String password) {
+    public Optional<User> findByLoginAndPassword(String login, String password) {
         Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.getTransaction().begin();
         Optional<User> user = currentSession
-                .createQuery(FIND_BY_LOGIN_AND_PASSWORD, User.class)
-                .setParameter(LOGIN, login)
-                .setParameter(PASSWORD,password)
+                .createQuery(FIND_BY_LOGIN_AND_PASSWORD_QUERY, User.class)
+                .setParameter(LOGIN_PLACEHOLDER, login)
+                .setParameter(PASSWORD_PLACEHOLDER, password)
                 .uniqueResultOptional();
-        currentSession.getTransaction().commit();
         return user;
     }
 

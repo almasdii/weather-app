@@ -33,7 +33,6 @@ import java.util.Properties;
 @ComponentScan("testingSpring")
 @EnableWebMvc
 @EnableTransactionManagement
-@EnableJpaRepositories("testingSpring.repository")
 @PropertySource("classpath:database.properties")
 public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
@@ -114,7 +113,6 @@ public class SpringConfig implements WebMvcConfigurer {
         Properties properties = new Properties();
         properties.put("hibernate.format_sql",environment.getProperty("hibernate.format_sql"));
         properties.put("hibernate.show_sql",environment.getProperty("hibernate.show_sql"));
-        properties.put("hibernate.current_session_context_class",environment.getProperty("hibernate.current_session_context_class"));
         properties.put("hibernate.hbm2ddl.auto",environment.getProperty("hibernate.hbm2ddl.auto"));
         properties.put("hibernate.dialect",environment.getProperty("hibernate.dialect"));
         properties.put("hibernate.default_schema",environment.getProperty("hibernate.default_schema"));
