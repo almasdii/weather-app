@@ -1,14 +1,16 @@
 package testingSpring.validator;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import testingSpring.dto.UserRegisterRequest;
+import testingSpring.dto.UserCredentialsRequest;
 import testingSpring.entity.User;
 import testingSpring.serivce.UserService;
 
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class UserRegisterValidator implements Validator {
 
@@ -21,12 +23,13 @@ public class UserRegisterValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return UserRegisterRequest.class.equals(clazz);
+        return UserCredentialsRequest.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        UserRegisterRequest user = (UserRegisterRequest) target;
+        UserCredentialsRequest user = (UserCredentialsRequest) target;
+        log.debug("login and password : {} , {} ",user.login(),user.password());
         Optional<User> userOptional = userService.findByLogin(user.login());
         if(userOptional.isPresent()){
             errors.rejectValue("login","","user login is already taken");

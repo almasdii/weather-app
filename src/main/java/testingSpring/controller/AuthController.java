@@ -9,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import testingSpring.dto.UserLoginRequest;
-import testingSpring.dto.UserRegisterRequest;
+import testingSpring.dto.UserCredentialsRequest;
 import testingSpring.serivce.AuthService;
 import testingSpring.util.SessionParameters;
 import testingSpring.validator.UserLoginValidator;
@@ -35,12 +34,12 @@ public class AuthController {
 
 
     @GetMapping(value = "/sign-in")
-    public String signInPage(@ModelAttribute("userLoginRequest") UserLoginRequest userLoginRequest) {
+    public String signInPage(@ModelAttribute("userLoginRequest") UserCredentialsRequest userLoginRequest) {
         return "sign-in";
     }
 
     @PostMapping(value = "/sign-in")
-    public String signIn(@ModelAttribute("userLoginRequest") @Valid UserLoginRequest userLoginRequest,
+    public String signIn(@ModelAttribute("userLoginRequest") @Valid UserCredentialsRequest userLoginRequest,
                          BindingResult result,
                          HttpServletResponse response) {
 
@@ -55,20 +54,21 @@ public class AuthController {
     }
 
     @GetMapping(value = "/sign-up")
-    public String signUpPage(@ModelAttribute("userRegisterRequest") UserRegisterRequest userRegisterRequest) {
+    public String signUpPage(@ModelAttribute("userRegisterRequest") UserCredentialsRequest userCredentialsRequest) {
         return "sign-up";
     }
 
     @PostMapping(value = "/sign-up")
-    public String signUp(@ModelAttribute("userRegisterRequest") @Valid UserRegisterRequest userRegisterRequest, BindingResult result) {
-        log.debug("User register request : {} ",userRegisterRequest.toString());
-        userRegisterValidator.validate(userRegisterRequest,result);
+    public String signUp(@ModelAttribute("userRegisterRequest") @Valid UserCredentialsRequest userCredentialsRequest, BindingResult result) {
+        log.debug("User register request : {} ", userCredentialsRequest.toString());
+
+        userRegisterValidator.validate(userCredentialsRequest,result);
 
         if(result.hasErrors()){
             return "sign-up-with-errors";
         }
 
-        service.register(userRegisterRequest);
+        service.register(userCredentialsRequest);
         return "redirect:/auth/sign-in";
     }
 

@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import testingSpring.dao.SessionDao;
 import testingSpring.dao.UserDao;
-import testingSpring.dto.UserLoginRequest;
-import testingSpring.dto.UserRegisterRequest;
+import testingSpring.dto.UserCredentialsRequest;
 import testingSpring.entity.User;
 import testingSpring.entity.WeatherSession;
 import testingSpring.exception.UserNotFoundException;
@@ -35,7 +34,7 @@ public class AuthService {
     }
 
     @Transactional
-    public UUID authenticate(UserLoginRequest dto){
+    public UUID authenticate(UserCredentialsRequest dto){
         User user = userDao.findByLogin(dto.login())
                 .orElseThrow(() -> new UserNotFoundException("No user found with this login : " + dto.login()));
         WeatherSession session = sessionService.create(user.getId());
@@ -66,7 +65,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void register(UserRegisterRequest dto){
+    public void register(UserCredentialsRequest dto){
         //validation
         //mapping
         //dao.save
