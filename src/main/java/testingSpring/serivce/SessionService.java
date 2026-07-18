@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import testingSpring.dao.SessionDao;
+import testingSpring.entity.User;
 import testingSpring.entity.WeatherSession;
 import testingSpring.exception.SessionNotFoundException;
 
@@ -28,11 +29,11 @@ public class SessionService {
     }
 
     @Transactional
-    public WeatherSession create(Long userId) {
-        removeByUserId(userId);
+    public WeatherSession create(User user) {
+        removeByUserId(user.getId());
 
         UUID uuid = UUID.randomUUID();
-        WeatherSession session = new WeatherSession(uuid,userId);
+        WeatherSession session = new WeatherSession(uuid,user);
         log.debug("New Session created : {} ",session.getId());
         return sessionDao.save(session);
     }

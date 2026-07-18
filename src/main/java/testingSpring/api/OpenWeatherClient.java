@@ -17,17 +17,20 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 @Slf4j
 @Component
 public class OpenWeatherClient {
     private final HttpClient httpClient;
     private final ObjectMapper mapper;
+    private  final Properties weatherApiProperties;
 
     @Autowired
-    public OpenWeatherClient(HttpClient httpClient, ObjectMapper mapper) {
+    public OpenWeatherClient(HttpClient httpClient, ObjectMapper mapper, Properties weatherApiProperties) {
         this.httpClient = httpClient;
         this.mapper = mapper;
+        this.weatherApiProperties = weatherApiProperties;
     }
 
     public List<LocationDetailsView> findAll(List<LocationResponse> locationResponses) {
@@ -35,7 +38,7 @@ public class OpenWeatherClient {
         List<LocationDetailsView> locationDetailsViewsList = new ArrayList<>();
         for(LocationResponse locationResponse: locationResponses){
 
-            String url = String.format("https://api.openweathermap.org/data/2.5/weather?lat=%.5f&lon=%.5f&appid=d5c6861bc694bf12e0d19183e6e07195"
+            String url = String.format(weatherApiProperties.getProperty("api_key_lat_lon")
                     ,locationResponse.lat(),locationResponse.lon());
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -74,7 +77,7 @@ public class OpenWeatherClient {
     }
 
     public List<LocationSearchView> search(String name) throws IOException, InterruptedException {
-        String format = String.format("https://api.openweathermap.org/geo/1.0/direct?q=%s&limit=10&appid=d5c6861bc694bf12e0d19183e6e07195", name);
+        String format = String.format(weatherApiProperties.getProperty("api_key_filter"), name);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(format))
                 .GET()

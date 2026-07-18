@@ -8,7 +8,6 @@ import testingSpring.dao.UserDao;
 import testingSpring.entity.User;
 import testingSpring.exception.UserNotFoundException;
 
-import java.awt.desktop.OpenFilesEvent;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,10 +23,10 @@ public class UserService {
     }
 
     public User findBySessionId(UUID uuid) {
-        return userDao.findBySessionId(uuid).orElseThrow(() -> new UserNotFoundException("User not found with this session"));
+        return userDao.findBySessionId(uuid).orElseThrow(() -> new UserNotFoundException("User not found with this session uuid " + uuid));
     }
 
-    public Optional<User> findByLogin(String name){
+    public Optional<User> findByLogin(String name) {
         return userDao.findByLogin(name);
     }
 }

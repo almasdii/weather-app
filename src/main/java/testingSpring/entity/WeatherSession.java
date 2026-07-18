@@ -11,20 +11,22 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = {"id"})
 @Table(name = "weather_session",schema = "weather_schema")
 @Entity
 public class WeatherSession {
     @Id
     private UUID id;
-    @Column(name = "user_id",nullable = false,updatable = false,unique = true)
-    private Long userId;
+
+    @OneToOne
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
+    private User user;
+
     @Column(name = "expires_at",nullable = false,updatable = false)
     private LocalDateTime createdAt;
 
-    public WeatherSession(UUID id,Long userId){
+    public WeatherSession(UUID id,User user){
         this.id = id;
-        this.userId = userId;
+        this.user = user;
         createdAt = LocalDateTime.now();
     }
 }

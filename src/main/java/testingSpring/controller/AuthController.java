@@ -49,7 +49,7 @@ public class AuthController {
         if (result.hasErrors()){
             return "sign-in-with-errors";
         }
-        UUID sessionUuid = service.authenticate(userLoginRequest);
+        UUID sessionUuid = service.signIn(userLoginRequest);
         setCookie(response, sessionUuid.toString(), SessionParameters.MAX_SESSION_SECONDS);
         return "redirect:/locations";
     }

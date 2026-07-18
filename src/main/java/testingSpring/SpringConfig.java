@@ -13,6 +13,8 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.hibernate.HibernateTransactionManager;
 import org.springframework.orm.jpa.hibernate.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -27,13 +29,17 @@ import tools.jackson.databind.ObjectMapper;
 import javax.sql.DataSource;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Properties;
 
 @Configuration
 @ComponentScan("testingSpring")
 @EnableWebMvc
 @EnableTransactionManagement
-@PropertySource("classpath:database.properties")
+@PropertySource(value = {
+        "classpath:application.properties",
+        "classpath:database.properties"
+})
 public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
     private final Environment environment;
@@ -45,10 +51,22 @@ public class SpringConfig implements WebMvcConfigurer {
     }
 
     @Bean
+    public Properties weatherApiProperties(){
+        Properties properties = new Properties();
+        properties.setProperty("api_key_filter", Objects.requireNonNull(environment.getProperty("api_key_filter")));
+        properties.setProperty("api_key_lat_lon", Objects.requireNonNull(environment.getProperty("api_key_lat_lon")));
+        return properties;
+    }
+
+    @Bean
     public HttpClient httpClient() {
         return HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
+    }
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder(10);
     }
 
     @Bean
