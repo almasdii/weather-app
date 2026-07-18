@@ -7,15 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.hibernate.HibernateTransactionManager;
 import org.springframework.orm.jpa.hibernate.LocalSessionFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -49,6 +44,11 @@ public class SpringConfig implements WebMvcConfigurer {
         this.applicationContext = applicationContext;
         this.environment = environment;
     }
+
+//    @Bean
+//    public CustomLocationDeserializer customLocationDeserializer(){
+//        return new CustomLocationDeserializer();
+//    }
 
     @Bean
     public Properties weatherApiProperties(){

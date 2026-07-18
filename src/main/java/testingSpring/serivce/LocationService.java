@@ -8,7 +8,6 @@ import testingSpring.api.OpenWeatherClient;
 import testingSpring.dao.LocationDao;
 import testingSpring.dto.LocationAddRequest;
 import testingSpring.dto.LocationDetailsView;
-import testingSpring.dto.LocationResponse;
 import testingSpring.dto.LocationSearchView;
 import testingSpring.entity.Location;
 import testingSpring.entity.User;
@@ -16,6 +15,7 @@ import testingSpring.mapper.LocationMapper;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,11 +38,17 @@ public class LocationService {
 
     public List<LocationDetailsView> findAll(UUID sessionValue) {
         User user = userService.findBySessionId(sessionValue);
-        List<Location> byUserId = locationDao.findByUserId(user.getId());
-        byUserId.forEach((location)-> log.debug("users locations : {}",location.getName()));
-        List<LocationResponse> locationResponses
-                = locationMapper.locationListToLocationResponseList(byUserId);
-        return openWeatherClient.findAll(locationResponses);
+
+        List<Location> locations = locationDao.findByUserId(user.getId());
+
+        List<LocationDetailsView> locationDetailsViewsList = new ArrayList<>();
+
+        for(Location location: locations){
+            LocationDetailsView locationDetailsView = openWeatherClient.findByLatAndLon(location.getLatitube(),location.getLongitube());
+            locationDetailsViewsList.add(locationDetailsView);
+        }
+
+        return locationDetailsViewsList;
     }
 
     public List<LocationSearchView> search(String name) {

@@ -4,18 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import testingSpring.dto.LocationDetailsView;
-import testingSpring.dto.LocationResponse;
 import testingSpring.dto.LocationSearchView;
+import testingSpring.exception.WeatherApiConnectionException;
+import testingSpring.exception.WeatherApiParseException;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,61 +33,44 @@ public class OpenWeatherClient {
         this.weatherApiProperties = weatherApiProperties;
     }
 
-    public List<LocationDetailsView> findAll(List<LocationResponse> locationResponses) {
-
-        List<LocationDetailsView> locationDetailsViewsList = new ArrayList<>();
-        for(LocationResponse locationResponse: locationResponses){
-
-            String url = String.format(weatherApiProperties.getProperty("api_key_lat_lon")
-                    ,locationResponse.lat(),locationResponse.lon());
-            HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-            HttpResponse<String> send = null;
-            try {
-                send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            LocationDetailsView locationDetailsView = mapJson(send.body());
-            locationDetailsViewsList.add(locationDetailsView);
-        }
-        return locationDetailsViewsList;
-    }
-
-
-    public LocationDetailsView mapJson(String string){
-        JsonNode jsonNode = mapper.readTree(string);
-        JsonNode main = jsonNode.get("main");
-        JsonNode weather = jsonNode.get("weather").get(0);
-        JsonNode coord = jsonNode.get("coord");
-
-        Integer humidity = main.get("humidity").asInt();
-        double feelsLike = main.get("feels_like").asDouble();
-        double temp = main.get("temp").asDouble();
-
-        String name = jsonNode.get("name").asString();
-        String description = weather.get("description").asString();
-        double lat = coord.get("lat").asDouble();
-        double lon = coord.get("lon").asDouble();
-
-        return new LocationDetailsView(temp, feelsLike, name, lat, lon, humidity, description);
-
-    }
-
-    public List<LocationSearchView> search(String name) throws IOException, InterruptedException {
+    public List<LocationSearchView> search(String name) {
         String format = String.format(weatherApiProperties.getProperty("api_key_filter"), name);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(format))
                 .GET()
                 .build();
-        HttpResponse<String> send = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        return mapJsonSearch(send.body());
+        HttpResponse<String> send = null;
+        try {
+            send = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return mapToLocationSearchView(send.body());
+        } catch (IOException e) {
+            throw new WeatherApiParseException("Error occurred while parsing json from",e);
+        }catch (InterruptedException e){
+            throw new WeatherApiConnectionException("Error while sending request to search locations with name : " + name,e);
+        }
     }
 
-    public List<LocationSearchView> mapJsonSearch(String json){
+    public List<LocationSearchView> mapToLocationSearchView(String json){
         return mapper.readValue(json, new TypeReference<List<LocationSearchView>>() {
         });
+    }
+
+    public LocationDetailsView findByLatAndLon(BigDecimal lat, BigDecimal lon) {
+        String url = String
+                .format(weatherApiProperties.getProperty("api_key_lat_lon"),lat,lon);
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .GET()
+                .build();
+        HttpResponse<String> send = null;
+        try {
+            send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            return mapper.readValue(send.body(), LocationDetailsView.class);
+        } catch (IOException e) {
+            throw new WeatherApiParseException("ERROR occurred while parsing json",e);
+        }catch (InterruptedException e){
+            log.warn("ERROR occurred while sending request failed to connect to find All users locations using lat and lot",e);
+            throw new WeatherApiConnectionException("failed to send request ",e);
+        }
     }
 }
