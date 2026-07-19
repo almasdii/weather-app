@@ -18,6 +18,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 @Slf4j
@@ -40,10 +41,15 @@ public class OpenWeatherClient {
                 .uri(URI.create(format))
                 .GET()
                 .build();
-        HttpResponse<String> send = null;
+        HttpResponse<String> response = null;
         try {
-            send = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return mapToLocationSearchView(send.body());
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            List<LocationSearchView> locationSearchViews = mapToLocationSearchView(response.body());
+            Optional<String> allLocationsName = locationSearchViews.stream().map(LocationSearchView::name).reduce((a, b) -> {
+                return a + " " + b;
+            });
+            log.debug("All searched locations : {} ",allLocationsName);
+            return locationSearchViews;
         } catch (IOException e) {
             throw new WeatherApiParseException("Error occurred while parsing json from",e);
         }catch (InterruptedException e){
@@ -63,10 +69,12 @@ public class OpenWeatherClient {
                 .uri(URI.create(url))
                 .GET()
                 .build();
-        HttpResponse<String> send = null;
+        HttpResponse<String> response = null;
         try {
-            send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            return mapper.readValue(send.body(), LocationDetailsView.class);
+            response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            LocationDetailsView locationDetailsView = mapper.readValue(response.body(), LocationDetailsView.class);
+            log.info("Locations info : {}",locationDetailsView.name());
+            return locationDetailsView;
         } catch (IOException e) {
             throw new WeatherApiParseException("ERROR occurred while parsing json",e);
         }catch (InterruptedException e){

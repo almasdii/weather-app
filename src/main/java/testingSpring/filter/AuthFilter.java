@@ -33,6 +33,8 @@ public class AuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+
+
         String servletPath = request.getServletPath();
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {

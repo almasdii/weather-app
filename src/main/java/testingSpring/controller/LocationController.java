@@ -44,6 +44,7 @@ public class LocationController {
     @PostMapping("/add")
     public String addLocation(@ModelAttribute LocationAddRequest locationAddRequest, @CookieValue("SessionUUID") UUID sessionUUID) {
         log.debug("lon : {} , lat : {} ",locationAddRequest.lon(),locationAddRequest.lat());
+        log.debug("add location info : {}",locationAddRequest.name());
         locationService.addLocation(locationAddRequest,sessionUUID);
         return "redirect:/locations";
     }
