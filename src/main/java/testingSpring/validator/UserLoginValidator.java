@@ -38,7 +38,7 @@ public class UserLoginValidator implements Validator {
                 = userService.findByLogin(loginRequest.login());
 
         if (userOptional.isEmpty()){
-            errors.rejectValue("name","","User is not exist with this login");
+            errors.rejectValue("login","","User is not exist with this login");
             return;
         }
         User user = userOptional.get();

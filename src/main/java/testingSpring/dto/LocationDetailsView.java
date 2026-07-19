@@ -8,9 +8,9 @@ public record LocationDetailsView(
         Double temp,
         Double feelsLike,
         String name,
-        Double lat,
-        Double lon,
         Integer humidity,
-        String description
+        String description,
+        String country,
+        String icon
 ) {
 }

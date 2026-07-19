@@ -34,7 +34,7 @@ public class LocationController {
 
     @GetMapping("/search")
     public String searchPage(@RequestParam(value = "name") String name,Model model){
-        List<LocationSearchView> search = locationService.search(name);
+        List<LocationSearchView> search = locationService.searchByName(name);
         model.addAttribute("locations",search);
         model.addAttribute("name",name);
         return "search-results";
@@ -45,13 +45,13 @@ public class LocationController {
     public String addLocation(@ModelAttribute LocationAddRequest locationAddRequest, @CookieValue("SessionUUID") UUID sessionUUID) {
         log.debug("lon : {} , lat : {} ",locationAddRequest.lon(),locationAddRequest.lat());
         locationService.addLocation(locationAddRequest,sessionUUID);
-        return "redirect:/";
+        return "redirect:/locations";
     }
 
     @PostMapping("/delete")
     public String deleteLocation(@ModelAttribute("name") String name){
         log.debug("delete location name : {} ", name);
         locationService.delete(name);
-        return "redirect:/";
+        return "redirect:/locations";
     }
 }

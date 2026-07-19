@@ -1,5 +1,6 @@
 package testingSpring.exception;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,6 +14,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public String handle(UserNotFoundException exception, Model model){
         model.addAttribute("exception",exception.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(WeatherApiConnectionException.class)
+    public String handle(WeatherApiConnectionException e, Model model){
+        model.addAttribute("");
+        return "error";
+    }
+
+    @ExceptionHandler(WeatherApiParseException.class)
+    public String handle(WeatherApiParseException e,Model model){
+        model.addAttribute("");
         return "error";
     }
 }

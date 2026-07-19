@@ -23,7 +23,7 @@ public class UserDao implements Dao<User, Long> {
     private static final String FIND_BY_SESSION_ID_QUERY = """
             SELECT u
             FROM User u
-            JOIN WeatherSession w ON u.id = w.userId
+            JOIN WeatherSession w ON u.id = w.user.id
             WHERE w.id = :sessionId
             """;
 

@@ -52,7 +52,7 @@ public class AuthService {
             log.debug("Session is Empty");
             return false;
         }
-        if(isExpired(session.get().getCreatedAt())){
+        if(isExpired(session.get().getExpires_at())){
             return false;
         }
         return session.get().getUser() != null;

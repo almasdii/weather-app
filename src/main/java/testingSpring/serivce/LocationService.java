@@ -13,7 +13,6 @@ import testingSpring.entity.Location;
 import testingSpring.entity.User;
 import testingSpring.mapper.LocationMapper;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,29 +42,25 @@ public class LocationService {
 
         List<LocationDetailsView> locationDetailsViewsList = new ArrayList<>();
 
-        for(Location location: locations){
-            LocationDetailsView locationDetailsView = openWeatherClient.findByLatAndLon(location.getLatitube(),location.getLongitube());
+        for (Location location : locations) {
+            LocationDetailsView locationDetailsView = openWeatherClient.searchByLatAndLon(location.getLatitube(), location.getLongitube());
             locationDetailsViewsList.add(locationDetailsView);
         }
 
         return locationDetailsViewsList;
     }
 
-    public List<LocationSearchView> search(String name) {
-        try {
-            return openWeatherClient.search(name);
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    public List<LocationSearchView> searchByName(String name) {
+        return openWeatherClient.searchByName(name);
     }
 
     @Transactional
     public void addLocation(LocationAddRequest locationAddRequest, UUID sessionUUID) {
         User user = userService.findBySessionId(sessionUUID);
         Location location = new Location(locationAddRequest.name()
-                ,user
-                ,BigDecimal.valueOf(locationAddRequest.lat())
-                ,BigDecimal.valueOf(locationAddRequest.lon()));
+                , user
+                , BigDecimal.valueOf(locationAddRequest.lat())
+                , BigDecimal.valueOf(locationAddRequest.lon()));
         locationDao.save(location);
     }
 

@@ -27,7 +27,7 @@
 <section id="page-content">
     <div class="container mt-4">
         <div class="d-flex my-4">
-            <form th:action="@{/location/search}" th:method="GET">
+            <form th:action="@{/locations/search}" th:method="GET">
                 <label for="name" class="form-label">Name</label>
                 <input id="name" type="search" name="name" placeholder="Enter Name Here">
                 <input class="btn btn-primary" type="submit" value="Search">
@@ -39,22 +39,21 @@
                 <div th:each="location : ${locations}" class="col-12 col-lg-3 col-md-6 mb-4">
                     <div class="card h-100 position-relative weather-card">
                         <div class="position-absolute weather-card-delete-form">
-                            <form th:action="@{/location/delete}" th:method="POST">
+                            <form th:action="@{/locations/delete}" th:method="POST">
                                 <input type="hidden" th:value="${location.name()}" name="name">
                                 <button class="btn-close" aria-label="Delete"></button>
                             </form>
                         </div>
                         <img class="card-img-top img-fluid"
-                             src="https://openweathermap.org/img/wn/01n@4x.png"
+                             th:src="@{'https://openweathermap.org/img/wn/' + ${location.icon()} + '@4x.png'}"
                              alt="Weather icon">
                         <div class="card-body d-flex flex-column">
 
-                            <h1 class="card-text" th:text="${location.temp()}"></h1>
-                            <h3 class="card-title" th:text="${location.name()}"></h3>
-                            <p class="card-text mb-1" th:text=" 'Feels like' +  ${location.feelsLike()} + '°C.'">
-                                <span th:text="${location.description()}"></span>
-                            </p>
-                            <p class="card-text mb-1" th:text="${location.humidity()} + '%'"></p>
+                            <h1 class="card-text" th:text="${location.temp()} + '°C.'"></h1>
+                            <h3 class="card-title" th:text="${location.name()} + ' ' + ${location.country()}"></h3>
+                            <p class="card-text mb-1" th:text=" 'Feels like ' +  ${location.feelsLike()} + ' °C.'">
+                            <p th:text=" ${location.description()}"></p>
+                            <p class="card-text mb-1" th:text="'humidity : ' + ${location.humidity()} + '%'"></p>
 
                         </div>
                     </div>

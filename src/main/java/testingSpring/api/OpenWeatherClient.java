@@ -2,6 +2,7 @@ package testingSpring.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import testingSpring.dto.LocationDetailsView;
 import testingSpring.dto.LocationSearchView;
@@ -24,16 +25,16 @@ import java.util.Properties;
 public class OpenWeatherClient {
     private final HttpClient httpClient;
     private final ObjectMapper mapper;
-    private  final Properties weatherApiProperties;
+    private final Properties weatherApiProperties;
 
     @Autowired
-    public OpenWeatherClient(HttpClient httpClient, ObjectMapper mapper, Properties weatherApiProperties) {
+    public OpenWeatherClient(HttpClient httpClient, ObjectMapper mapper,@Qualifier("weatherApiProperties") Properties weatherApiProperties) {
         this.httpClient = httpClient;
         this.mapper = mapper;
         this.weatherApiProperties = weatherApiProperties;
     }
 
-    public List<LocationSearchView> search(String name) {
+    public List<LocationSearchView> searchByName(String name) {
         String format = String.format(weatherApiProperties.getProperty("api_key_filter"), name);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(format))
@@ -55,7 +56,7 @@ public class OpenWeatherClient {
         });
     }
 
-    public LocationDetailsView findByLatAndLon(BigDecimal lat, BigDecimal lon) {
+    public LocationDetailsView searchByLatAndLon(BigDecimal lat, BigDecimal lon) {
         String url = String
                 .format(weatherApiProperties.getProperty("api_key_lat_lon"),lat,lon);
         HttpRequest httpRequest = HttpRequest.newBuilder()

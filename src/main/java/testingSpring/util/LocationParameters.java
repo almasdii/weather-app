@@ -14,5 +14,8 @@ public class LocationParameters {
     public final String MAIN = "main";
     public final String LAT = "lat";
     public final String LON = "lon";
+    public final String SYS = "sys";
+    public final String COUNTRY = "country";
+    public final String ICON = "icon";
 }
 

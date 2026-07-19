@@ -15,7 +15,7 @@ public class SessionDao implements Dao<WeatherSession, UUID> {
             """
                     DELETE 
                     FROM WeatherSession ws
-                    WHERE ws.userId = :user_id
+                    WHERE ws.user.id = :user_id
                     """;
     private static final String USER_ID_PLACEHOLDER = "user_id";
     private final SessionFactory factory;

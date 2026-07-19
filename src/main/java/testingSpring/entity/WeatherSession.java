@@ -2,9 +2,9 @@ package testingSpring.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import testingSpring.util.SessionParameters;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,11 +22,11 @@ public class WeatherSession {
     private User user;
 
     @Column(name = "expires_at",nullable = false,updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime expires_at;
 
     public WeatherSession(UUID id,User user){
         this.id = id;
         this.user = user;
-        createdAt = LocalDateTime.now();
+        expires_at = LocalDateTime.now().plusMinutes(SessionParameters.MAX_SESSION_MINUTES);
     }
 }
