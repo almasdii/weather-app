@@ -68,3 +68,7 @@ replay_pid*
 .env
 application.properties
 database.properties
+.properties
+src/main/resources/application.properties
+src/main/resources/database.properties
+src/main/resources/.properties
