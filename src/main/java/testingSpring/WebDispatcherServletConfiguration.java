@@ -3,7 +3,9 @@ package testingSpring;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterRegistration;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import org.springframework.web.filter.DelegatingFilterProxy;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class WebDispatcherServletConfiguration extends AbstractAnnotationConfigDispatcherServletInitializer {
@@ -27,5 +29,15 @@ public class WebDispatcherServletConfiguration extends AbstractAnnotationConfigD
         return new Filter[]{
                 new DelegatingFilterProxy("authFilter")
         };
+    }
+
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        super.onStartup(servletContext);
+        setFilter(servletContext);
+    }
+    private void setFilter(ServletContext servletContext){
+        servletContext.addFilter("HiddenHttpMethodFilter",new HiddenHttpMethodFilter()).addMappingForUrlPatterns(null,true
+        ,"/*");
     }
 }

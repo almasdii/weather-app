@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import testingSpring.api.OpenWeatherClient;
 import testingSpring.dao.LocationDao;
 import testingSpring.dto.LocationAddRequest;
+import testingSpring.dto.LocationApiResponse;
 import testingSpring.dto.LocationDetailsView;
 import testingSpring.dto.LocationSearchView;
 import testingSpring.entity.Location;
@@ -43,7 +44,17 @@ public class LocationService {
         List<LocationDetailsView> locationDetailsViewsList = new ArrayList<>();
 
         for (Location location : locations) {
-            LocationDetailsView locationDetailsView = openWeatherClient.searchByLatAndLon(location.getLatitube(), location.getLongitube());
+            LocationApiResponse locationApiResponse = openWeatherClient.searchByLatAndLon(location.getLatitube().doubleValue(), location.getLongitube().doubleValue());
+            LocationDetailsView locationDetailsView
+                    = new LocationDetailsView(locationApiResponse.temp()
+                    , locationApiResponse.feelsLike()
+                    , locationApiResponse.humidity()
+                    , locationApiResponse.description()
+                    , location.getCountry()
+                    , locationApiResponse.icon()
+                    , location.getName(),
+                    location.getLatitube().doubleValue(),
+                    location.getLongitube().doubleValue());
             locationDetailsViewsList.add(locationDetailsView);
         }
 
@@ -57,15 +68,17 @@ public class LocationService {
     @Transactional
     public void addLocation(LocationAddRequest locationAddRequest, UUID sessionUUID) {
         User user = userService.findBySessionId(sessionUUID);
-        Location location = new Location(locationAddRequest.name()
-                , user
+        Location location = new Location(locationAddRequest.name(),
+                user
                 , BigDecimal.valueOf(locationAddRequest.lat())
-                , BigDecimal.valueOf(locationAddRequest.lon()));
+                , BigDecimal.valueOf(locationAddRequest.lon())
+                , locationAddRequest.country()
+        );
         locationDao.save(location);
     }
 
     @Transactional
-    public void delete(String name) {
-        locationDao.removeByName(name);
+    public void deleteByLatAndLon(Double lan, Double lon) {
+        locationDao.removeByLatAndLon(lan, lon);
     }
 }

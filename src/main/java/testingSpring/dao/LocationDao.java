@@ -19,13 +19,16 @@ public class LocationDao implements Dao<Location, UUID> {
             JOIN l.user u
             WHERE u.id = :user_id
             """;
-    private static final String DELETE_BY_NAME_QUERY = """
+    private static final String DELETE_BY_LAT_AND_LON_QUERY = """
             DELETE 
             FROM Location l 
-            WHERE l.name = :name
+            WHERE l.latitube = :latitube
+            AND l.longitube = :longitube
             """;
     private static final String USER_ID_PLACEHOLDER = "user_id";
     private static final String NAME_PLACEHOLDER = "name";
+    private static final String LATITUBE_PLACEHOLDER = "latitube";
+    private static final String LONGITUBE_PLACEHOLDER = "longitube";
     private final SessionFactory factory;
 
     @Autowired
@@ -62,10 +65,11 @@ public class LocationDao implements Dao<Location, UUID> {
     }
 
 
-    public void removeByName(String name) {
+    public void removeByLatAndLon(Double lat,Double lon) {
         Session currentSession = factory.getCurrentSession();
-        currentSession.createMutationQuery(DELETE_BY_NAME_QUERY)
-                .setParameter(NAME_PLACEHOLDER, name)
+        currentSession.createMutationQuery(DELETE_BY_LAT_AND_LON_QUERY)
+                .setParameter(LATITUBE_PLACEHOLDER, lat)
+                .setParameter(LONGITUBE_PLACEHOLDER,lon)
                 .executeUpdate();
     }
 }

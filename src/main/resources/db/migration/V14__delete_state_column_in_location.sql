@@ -1,0 +1,2 @@
+ALTER TABLE weather_schema.weather_location
+DROP COLUMN state

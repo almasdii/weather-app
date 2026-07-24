@@ -2,7 +2,7 @@ package testingSpring.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import testingSpring.dto.LocationDetailsView;
+import testingSpring.dto.LocationApiResponse;
 import testingSpring.dto.LocationResponse;
 import testingSpring.entity.Location;
 
@@ -15,6 +15,6 @@ public interface LocationMapper {
     LocationResponse locationToLocationResponse(Location location);
     List<LocationResponse> locationListToLocationResponseList(List<Location> locations);
 
-    LocationDetailsView locationToLocationDetailsView(Location location);
+    LocationApiResponse locationToLocationDetailsView(Location location);
 
 }

@@ -27,8 +27,8 @@ public class LocationController {
     @GetMapping
     public String indexPage(Model model, @CookieValue("SessionUUID") UUID sessionUuid){
         log.debug("User session uuid : {}",sessionUuid);
-        List<LocationDetailsView> locationDetailsViews = locationService.findAll(sessionUuid);
-        model.addAttribute("locations",locationDetailsViews);
+        List<LocationDetailsView> locationApiResponses = locationService.findAll(sessionUuid);
+        model.addAttribute("locations", locationApiResponses);
         return "index";
     }
 
@@ -41,7 +41,7 @@ public class LocationController {
     }
 
 
-    @PostMapping("/add")
+    @PostMapping()
     public String addLocation(@ModelAttribute LocationAddRequest locationAddRequest, @CookieValue("SessionUUID") UUID sessionUUID) {
         log.debug("lon : {} , lat : {} ",locationAddRequest.lon(),locationAddRequest.lat());
         log.debug("add location info : {}",locationAddRequest.name());
@@ -49,10 +49,11 @@ public class LocationController {
         return "redirect:/locations";
     }
 
-    @PostMapping("/delete")
-    public String deleteLocation(@ModelAttribute("name") String name){
-        log.debug("delete location name : {} ", name);
-        locationService.delete(name);
+
+    @DeleteMapping()
+    public String deleteLocation(@RequestParam("latitube") Double latitube,@RequestParam("longitube") Double longitube){
+        log.debug("delete mapping called for : {} , {} ",latitube,longitube);
+        locationService.deleteByLatAndLon(latitube,longitube);
         return "redirect:/locations";
     }
 }

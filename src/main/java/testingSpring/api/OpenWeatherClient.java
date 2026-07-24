@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import testingSpring.dto.LocationDetailsView;
+import testingSpring.dto.LocationApiResponse;
 import testingSpring.dto.LocationSearchView;
 import testingSpring.exception.WeatherApiConnectionException;
 import testingSpring.exception.WeatherApiParseException;
@@ -12,7 +12,6 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -62,9 +61,10 @@ public class OpenWeatherClient {
         });
     }
 
-    public LocationDetailsView searchByLatAndLon(BigDecimal lat, BigDecimal lon) {
+    public LocationApiResponse searchByLatAndLon(Double lat, Double lon) {
         String url = String
                 .format(weatherApiProperties.getProperty("api_key_lat_lon"),lat,lon);
+        log.debug("url to search by lat and lon : {}",url);
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .GET()
@@ -72,9 +72,9 @@ public class OpenWeatherClient {
         HttpResponse<String> response = null;
         try {
             response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            LocationDetailsView locationDetailsView = mapper.readValue(response.body(), LocationDetailsView.class);
-            log.info("Locations info : {}",locationDetailsView.name());
-            return locationDetailsView;
+            LocationApiResponse locationApiResponse = mapper.readValue(response.body(), LocationApiResponse.class);
+
+            return locationApiResponse;
         } catch (IOException e) {
             throw new WeatherApiParseException("ERROR occurred while parsing json",e);
         }catch (InterruptedException e){

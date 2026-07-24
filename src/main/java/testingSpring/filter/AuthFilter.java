@@ -34,8 +34,6 @@ public class AuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-
-        String servletPath = request.getServletPath();
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             response.sendRedirect("/weather/auth/sign-in");
