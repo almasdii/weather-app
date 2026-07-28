@@ -5,7 +5,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import weather.dto.UserRegisterRequest;
 import weather.entity.User;
-import weather.serivce.UserService;
+import weather.service.UserService;
 
 import java.util.Optional;
 

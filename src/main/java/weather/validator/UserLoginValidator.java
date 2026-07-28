@@ -7,8 +7,8 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import weather.dto.UserLoginRequest;
 import weather.entity.User;
-import weather.serivce.AuthService;
-import weather.serivce.UserService;
+import weather.service.AuthService;
+import weather.service.UserService;
 
 import java.util.Optional;
 

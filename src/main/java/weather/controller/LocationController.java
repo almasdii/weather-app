@@ -10,7 +10,7 @@ import weather.dto.LocationAddRequest;
 import weather.dto.LocationDeleteRequest;
 import weather.dto.LocationDetailsView;
 import weather.dto.LocationSearchView;
-import weather.serivce.LocationService;
+import weather.service.LocationService;
 
 import java.util.List;
 import java.util.UUID;

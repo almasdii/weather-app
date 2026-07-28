@@ -11,7 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import weather.dto.UserLoginRequest;
 import weather.dto.UserRegisterRequest;
-import weather.serivce.AuthService;
+import weather.service.AuthService;
 import weather.util.SessionParameters;
 import weather.validator.UserLoginValidator;
 import weather.validator.UserRegisterValidator;

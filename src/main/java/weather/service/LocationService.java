@@ -1,4 +1,4 @@
-package weather.serivce;
+package weather.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +26,12 @@ public class LocationService {
     private final LocationDao locationDao;
     private final UserService userService;
     private final OpenWeatherClient openWeatherClient;
-    private final LocationMapper locationMapper;
 
     @Autowired
-    public LocationService(LocationDao locationDao, UserService userService, OpenWeatherClient openWeatherClient, LocationMapper locationMapper) {
+    public LocationService(LocationDao locationDao, UserService userService, OpenWeatherClient openWeatherClient) {
         this.locationDao = locationDao;
         this.userService = userService;
         this.openWeatherClient = openWeatherClient;
-        this.locationMapper = locationMapper;
     }
 
     public List<LocationDetailsView> findAll(UUID sessionValue) {

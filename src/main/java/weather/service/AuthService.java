@@ -1,4 +1,4 @@
-package weather.serivce;
+package weather.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,8 @@ import weather.dto.UserLoginRequest;
 import weather.dto.UserRegisterRequest;
 import weather.entity.User;
 import weather.entity.WeatherSession;
+import weather.exception.BadUserCredentialsException;
+import weather.exception.UserAlreadyExistException;
 import weather.exception.UserNotFoundException;
 import weather.util.SessionParameters;
 
@@ -39,6 +41,10 @@ public class AuthService {
     public UUID signIn(UserLoginRequest dto){
         User user = userDao.findByLogin(dto.login())
                 .orElseThrow(() -> new UserNotFoundException("No user found with this login : " + dto.login()));
+
+        if(!isPasswordMatch(dto.password(),user.getPassword())){
+            throw new BadUserCredentialsException("User name or password incorrect");
+        }
         WeatherSession session = sessionService.create(user);
         return session.getId();
     }
@@ -64,6 +70,10 @@ public class AuthService {
 
     @Transactional
     public void register(UserRegisterRequest dto){
+        Optional<User> optionalUser = userDao.findByLogin(dto.login());
+        if(optionalUser.isPresent()){
+            throw new UserAlreadyExistException("User with " + dto.login() + " already exist");
+        }
         User user = new User(dto.login(),passwordEncoder.encode(dto.password()));
         userDao.save(user);
     }

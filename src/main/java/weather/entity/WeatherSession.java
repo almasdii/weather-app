@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import weather.util.SessionParameters;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class WeatherSession {
     private User user;
 
     @Column(name = "expires_at",nullable = false,updatable = false)
+    @Setter
     private LocalDateTime expires_at;
 
     public WeatherSession(UUID id,User user){
