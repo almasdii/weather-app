@@ -9,11 +9,11 @@
         </layout>
     </appender>
 
-    <logger name="testingSpring" level="debug" additivity="false">
+    <logger name="weather" level="debug" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <root name="testingSpring" level="error">
+    <root name="weather" level="error">
         <appender-ref ref="CONSOLE"/>
     </root>
 

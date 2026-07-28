@@ -1,2 +1,2 @@
-ALTER TABLE weather_schema.weather_user
+ALTER TABLE weather_user
 DROP CONSTRAINT weather_user_password_key

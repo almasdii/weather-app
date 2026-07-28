@@ -1,0 +1,68 @@
+package weather.filter;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+import weather.serivce.AuthService;
+import weather.util.SessionParameters;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.UUID;
+
+@Component
+@Slf4j
+public class AuthFilter extends OncePerRequestFilter {
+
+    private final AuthService service;
+
+    @Autowired
+    public AuthFilter(AuthService service) {
+        this.service = service;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            response.sendRedirect("/weather/auth/sign-in");
+            return;
+        }
+        Optional<String> sessionUuidOptional = getSession(cookies);
+        if (sessionUuidOptional.isEmpty() || !service.isAuthenticated(UUID.fromString(sessionUuidOptional.get()))) {
+            response.sendRedirect("/weather/auth/sign-in");
+            return;
+        }
+        request.setAttribute("userSession",sessionUuidOptional.get());
+        filterChain.doFilter(request, response);
+    }
+
+    private Optional<String> getSession(Cookie[] cookies){
+        return Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals(SessionParameters.SESSION_UUID))
+                .map(Cookie::getValue)
+                .findFirst();
+    }
+
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+
+        String path = request.getServletPath();
+
+        return path.startsWith("/auth")
+                || path.startsWith("/css")
+                || path.startsWith("/js")
+                || path.startsWith("/images");
+    }
+}

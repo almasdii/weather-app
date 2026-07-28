@@ -40,8 +40,8 @@
                     <div class="card h-100 position-relative weather-card">
                         <div class="position-absolute weather-card-delete-form">
                             <form th:action="@{/locations}" th:method="DELETE">
-                                <input type="hidden" th:value="${location.lat()}" name="latitude">
-                                <input type="hidden" th:value="${location.lon()}" name="longitube">
+                                <input th:type="hidden" th:value="${location.lat()}" th:name="latitube">
+                                <input th:type="hidden" th:value="${location.lon()}" th:name="longitube">
                                 <button class="btn-close" aria-label="Delete"></button>
                             </form>
                         </div>
