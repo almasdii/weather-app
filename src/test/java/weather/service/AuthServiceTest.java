@@ -121,6 +121,7 @@ public class AuthServiceTest {
 
         WeatherSession weatherSession = sessionDao.findById(uuid).get();
 
+
         weatherSession.setExpires_at(weatherSession.getExpires_at().minusMinutes(SessionParameters.MAX_SESSION_MINUTES));
 
         sessionDao.save(weatherSession);
