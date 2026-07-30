@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:charset="UTF-8">
 <head>
     <meta charset="UTF-8">
     <title>Weather Viewer – Homepage</title>
@@ -27,7 +27,7 @@
 <section id="page-content">
     <div class="container mt-4">
         <div class="d-flex my-4">
-            <form th:action="@{/location/search}" th:method="GET">
+            <form th:action="@{/locations/search}" th:method="GET">
                 <label for="name" class="form-label">Name</label>
                 <input id="name" th:value="${name}" type="search" name="name" placeholder="Enter Name Here">
                 <input class="btn btn-primary" type="submit" value="Search">
@@ -47,10 +47,11 @@
                             <p class="card-text mb-1" th:text="'Country: ' + ${location.country()}"></p>
                             <p class="card-text mb-3" th:text="'State: ' + ${location.state()}"></p>
                             <div class="mt-auto">
-                                <form th:action="@{/location/add}" th:method="POST">
+                                <form th:action="@{/locations}" th:method="POST">
                                     <input th:value="${location.lat()}" th:type="hidden" th:name="lat">
                                     <input th:value="${location.lon()}" th:type="hidden" th:name="lon">
                                     <input th:value="${location.name()}" th:type="hidden" th:name="name">
+                                    <input th:value="${location.country()}" th:type="hidden" th:name="country">
                                     <input type="submit" value="Add" class="btn btn-primary">
                                 </form>
                             </div>

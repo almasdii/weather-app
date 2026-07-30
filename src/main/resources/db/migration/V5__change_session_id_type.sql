@@ -1,2 +1,2 @@
-ALTER TABLE weather_schema.weather_session
+ALTER TABLE weather_session
 DROP COLUMN id

@@ -1,0 +1,2 @@
+ALTER TABLE weather_location
+DROP CONSTRAINT weather_location_name_key;
